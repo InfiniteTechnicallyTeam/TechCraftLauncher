@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox alignment="CENTER" spacing="20" styleClass="root-pane"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="itt.tcl.ui.controller.LoginController"
+      prefWidth="500" prefHeight="400">
+
+    <padding><Insets top="40" right="40" bottom="40" left="40"/></padding>
+
+    <Text text="TechCraftLauncher" styleClass="title-text"/>
+
+    <Text text="Sign in to start playing" styleClass="subtitle-text"/>
+
+    <Button fx:id="msLoginBtn" text="Microsoft Login" styleClass="primary-btn"
+            prefWidth="300" prefHeight="40"/>
+
+    <Separator prefWidth="300"/>
+
+    <Text text="Or play offline" styleClass="label-text"/>
+
+    <HBox alignment="CENTER" spacing="10">
+        <TextField fx:id="offlineNameField" promptText="Username" prefWidth="200" prefHeight="35"/>
+        <Button fx:id="offlineLoginBtn" text="Play" styleClass="secondary-btn"
+                prefWidth="80" prefHeight="35"/>
+    </HBox>
+
+    <ProgressIndicator fx:id="progressIndicator" prefWidth="40" prefHeight="40"/>
+
+    <Text fx:id="statusText" styleClass="status-text"/>
+</VBox>

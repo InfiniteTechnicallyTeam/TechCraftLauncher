@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="20" styleClass="root-pane"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="itt.tcl.ui.controller.SettingsController"
+      prefWidth="500" prefHeight="400">
+
+    <padding><Insets top="30" right="40" bottom="30" left="40"/></padding>
+
+    <Text text="Settings" styleClass="title-text"/>
+
+    <Separator/>
+
+    <VBox spacing="8">
+        <Text text="Mirror Source" styleClass="label-text"/>
+        <ComboBox fx:id="mirrorCombo" prefWidth="300" prefHeight="35"/>
+    </VBox>
+
+    <Region VBox.vgrow="ALWAYS"/>
+
+    <Button fx:id="backBtn" text="Back" styleClass="secondary-btn"
+            prefWidth="150" prefHeight="35"/>
+</VBox>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane styleClass="root-pane"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="itt.tcl.ui.controller.MainController"
+            prefWidth="700" prefHeight="500">
+
+    <!-- Top: Account info -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="10" styleClass="top-bar">
+            <padding><Insets top="10" right="20" bottom="10" left="20"/></padding>
+            <Text text="Account:" styleClass="label-text"/>
+            <Text fx:id="accountText" text="Offline" styleClass="accent-text"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="logoutBtn" text="Logout" styleClass="text-btn"/>
+        </HBox>
+    </top>
+
+    <!-- Center: Version select + Launch -->
+    <center>
+        <VBox alignment="CENTER" spacing="30">
+            <padding><Insets top="20" right="40" bottom="20" left="40"/></padding>
+
+            <Text text="Select Version" styleClass="subtitle-text"/>
+
+            <ComboBox fx:id="versionCombo" prefWidth="300" prefHeight="40"
+                      promptText="Choose a version..."/>
+
+            <Button fx:id="launchBtn" text="Launch Game" styleClass="launch-btn"
+                    prefWidth="300" prefHeight="50"/>
+
+            <ProgressBar fx:id="progressBar" prefWidth="300" visible="false"/>
+
+            <Text fx:id="statusText" styleClass="status-text"/>
+        </VBox>
+    </center>
+
+    <!-- Bottom: Settings -->
+    <bottom>
+        <HBox alignment="CENTER" spacing="10" styleClass="bottom-bar">
+            <padding><Insets top="10" right="20" bottom="15" left="20"/></padding>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="settingsBtn" text="Settings" styleClass="text-btn"/>
+        </HBox>
+    </bottom>
+</BorderPane>
