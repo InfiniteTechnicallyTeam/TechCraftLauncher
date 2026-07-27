@@ -1,48 +1,247 @@
-# 🚀 TechCraftLauncher
+# TechCraftLauncher
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
-<!-- 根据实际情况修改上述徽章 -->
+<p align="center">
+  <img src="https://github.com/InfiniteTechnicallyTeam.png" width="120">
+</p>
 
-**TechCraftLauncher** 是由 [InfiniteTechnicallyTeam](https://github.com/InfiniteTechnicallyTeam) 专为 TechCraft（或您的服务器/整合包名称）量身定制的《我的世界》（Minecraft）启动器。
+<h3 align="center">
+  一个面向 Minecraft 玩家与服务器管理者的现代化启动器
+</h3>
 
-我们的目标是为玩家提供最轻量、最便捷的启动体验，告别繁琐的 Java 配置与模组安装，实现“一键畅玩”。
+<p align="center">
+  <b>Developed by InfiniteTechnicallyTeam</b>
+</p>
 
 ---
 
-## ✨ 核心特性 (Features)
+## 📖 项目介绍
 
-- **一键启动**：内置环境检测，自动补全缺失的 Java 运行库。
-- **自动同步更新**：与服务器端实时同步，自动下载并更新最新的 Modpack（整合包）与配置文件。
-- **微软账号支持**：安全快捷的微软正版账号登录验证。
-- **极简 UI 设计**：流畅的交互体验，没有多余的广告和复杂选项。
-- **性能优化**：智能分配游戏内存，提供最佳的科技向模组运行环境。
+**TechCraftLauncher (TCL)** 是由 **InfiniteTechnicallyTeam** 开发的 Minecraft 启动器项目。
 
-## 🛠️ 技术栈 (Tech Stack)
+目标是打造一个：
 
-<!-- 请在这里补充你们使用的开发语言和框架，例如： -->
-- **前端 UI**：[Vue.js / React] + [Tailwind CSS] (示例)
-- **核心框架**：[Tauri / Electron / C# WPF] (示例)
-- **启动核心**：基于 [Minecraft-Console-Client / 其他开源启动核心] (示例)
+- 简洁
+- 高性能
+- 自动化
+- 面向 Mod 玩家与服务器开发者
 
-## 📦 安装与运行 (Installation & Usage)
+的 Minecraft 管理工具。
 
-### 面向玩家（普通用户）
-1. 前往 [Releases](https://github.com/InfiniteTechnicallyTeam/TechCraftLauncher/releases) 页面下载最新版本的安装包。
-2. 双击运行，登录你的账号，点击“启动游戏”即可。
+不仅提供游戏启动能力，还计划支持：
 
-### 面向开发者（本地编译）
-如果你想为 **TechCraftLauncher** 贡献代码或进行二次开发，请按照以下步骤配置本地环境：
+- ModPack 自动安装
+- Mod 自动管理
+- Minecraft 版本管理
+- Java 环境管理
+- 服务端生成
+- 自动更新系统
 
-```bash
-# 1. 克隆仓库到本地
-git clone [https://github.com/InfiniteTechnicallyTeam/TechCraftLauncher.git](https://github.com/InfiniteTechnicallyTeam/TechCraftLauncher.git)
+让玩家可以更方便地管理自己的 Minecraft 环境。
 
-# 2. 进入项目目录
-cd TechCraftLauncher
+---
 
-# 3. 安装依赖 (以 Node.js 项目为例)
-npm install
+# ✨ 特性
 
-# 4. 启动本地开发环境
-npm run dev
+## 🎮 Minecraft 启动
+
+支持 Minecraft 游戏实例管理：
+
+- 多版本管理
+- 自动生成启动参数
+- Java 自动选择
+- JVM 参数优化
+- 游戏日志管理
+
+
+---
+
+## 📦 ModPack 支持
+
+计划支持：
+
+- Modrinth `.mrpack`
+- 自动下载 Mod
+- 自动安装依赖
+- 配置文件同步
+
+
+示例：
+
+```
+Modrinth Pack
+
+        |
+        v
+
+TechCraftLauncher
+
+        |
+        v
+
+完整 Minecraft 实例
+```
+
+---
+
+## ☕ Java 管理
+
+自动检测并管理 Java 环境：
+
+支持：
+
+| Minecraft版本 | Java |
+|-|-|
+| 1.12及以下 | Java 8 |
+| 1.16 - 1.20.1 | Java 17 |
+| 1.20.5+ | Java 21+ |
+
+未来支持自动下载运行环境。
+
+---
+
+## 🖥️ 服务端工具链
+
+TechCraftLauncher 计划提供：
+
+- 客户端整合包转换服务端
+- Forge Server 自动安装
+- Fabric Server 自动安装
+- 服务端文件生成
+- 服务器配置管理
+
+
+目标：
+
+```
+客户端 ModPack
+
+        ↓
+
+Server Builder
+
+        ↓
+
+Minecraft Server
+```
+
+---
+
+# 🏗️ 项目结构
+
+当前项目：
+
+```
+TechCraftLauncher
+
+├── src
+│   └── main
+│
+├── build.gradle.kts
+├── settings.gradle.kts
+└── gradle
+```
+
+未来规划：
+
+```
+TechCraftLauncher
+
+├── launcher-core
+│
+├── launcher-ui
+│
+├── minecraft
+│
+├── auth
+│
+├── downloader
+│
+├── updater
+│
+└── server-builder
+```
+
+---
+
+# 🔧 技术栈
+
+## 开发语言
+
+- Java
+
+## 构建工具
+
+- Gradle
+
+## 支持平台
+
+计划支持：
+
+- Windows
+- Linux
+- macOS
+
+
+---
+
+# 🚀 开发计划
+
+## Phase 1
+
+- [x] 基础启动器框架
+- [ ] Minecraft 启动核心
+- [ ] 游戏实例管理
+
+
+## Phase 2
+
+- [ ] Modrinth Pack 支持
+- [ ] 自动下载系统
+- [ ] 自动更新
+
+
+## Phase 3
+
+- [ ] Forge/Fabric 服务端生成
+- [ ] 服务器管理工具
+- [ ] 云端同步
+
+
+---
+
+# 🤝 参与开发
+
+欢迎提交：
+
+- Issue
+- Pull Request
+- 功能建议
+
+
+如果你喜欢这个项目，可以 Star 支持我们。
+
+---
+
+# 📜 License
+
+本项目遵循项目许可证协议。
+
+---
+
+# 👥 关于团队
+
+**InfiniteTechnicallyTeam**
+
+专注于：
+
+- Minecraft 工具开发
+- Java 应用开发
+- 游戏生态工具
+
+官方网站：
+
+> Coming Soon
+
+GitHub：
+
+https://github.com/InfiniteTechnicallyTeam
