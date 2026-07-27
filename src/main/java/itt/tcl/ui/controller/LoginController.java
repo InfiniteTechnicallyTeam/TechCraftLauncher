@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import itt.tcl.auth.AuthManager;
 import itt.tcl.config.TCLPaths;
 import itt.tcl.ui.App;
+import itt.tcl.ui.LanguageManager;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -45,7 +46,7 @@ public final class LoginController {
 
     private void doMicrosoftLogin() {
         setBusy(true);
-        setStatus("Opening Microsoft sign-in in your browser…", "status-active");
+        setStatus(LanguageManager.text("login.status.microsoft"), "status-active");
 
         Task<Void> task = new Task<>() {
             @Override
@@ -59,7 +60,10 @@ public final class LoginController {
 
         task.setOnFailed(e -> {
             setBusy(false);
-            setStatus("Sign-in failed: " + friendlyMessage(task.getException()), "status-error");
+            setStatus(
+                    LanguageManager.text("login.status.failed", friendlyMessage(task.getException())),
+                    "status-error"
+            );
         });
 
         Thread worker = new Thread(task, "tcl-microsoft-login");
@@ -70,12 +74,12 @@ public final class LoginController {
     private void doOfflineLogin() {
         String name = offlineNameField.getText().trim();
         if (name.isEmpty()) {
-            setStatus("Enter a username to continue offline.", "status-warning");
+            setStatus(LanguageManager.text("login.status.enterName"), "status-warning");
             offlineNameField.requestFocus();
             return;
         }
         if (!name.matches("[A-Za-z0-9_]{1,16}")) {
-            setStatus("Use 1–16 letters, numbers, or underscores.", "status-warning");
+            setStatus(LanguageManager.text("login.status.invalidName"), "status-warning");
             offlineNameField.requestFocus();
             return;
         }
@@ -93,7 +97,10 @@ public final class LoginController {
             );
         } catch (Exception ex) {
             setBusy(false);
-            setStatus("Could not create the offline profile: " + friendlyMessage(ex), "status-error");
+            setStatus(
+                    LanguageManager.text("login.status.profileFailed", friendlyMessage(ex)),
+                    "status-error"
+            );
             return;
         }
         App.getSceneManager().showMain();
@@ -127,7 +134,7 @@ public final class LoginController {
 
     private String friendlyMessage(Throwable error) {
         if (error == null || error.getMessage() == null || error.getMessage().isBlank()) {
-            return "Unknown error";
+            return LanguageManager.text("common.unknownError");
         }
         return error.getMessage();
     }

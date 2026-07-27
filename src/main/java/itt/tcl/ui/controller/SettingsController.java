@@ -2,6 +2,7 @@ package itt.tcl.ui.controller;
 
 import itt.tcl.config.TCLPaths;
 import itt.tcl.ui.App;
+import itt.tcl.ui.LanguageManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -21,8 +22,8 @@ public final class SettingsController {
     @FXML
     public void initialize() {
         mirrorCombo.getItems().setAll(
-                "Automatic — BMCLAPI with official fallback",
-                "Official Mojang services"
+                LanguageManager.text("settings.source.auto"),
+                LanguageManager.text("settings.source.official")
         );
         mirrorCombo.getSelectionModel().selectFirst();
         updateMirrorDescription(0);
@@ -37,26 +38,26 @@ public final class SettingsController {
 
     private void updateMirrorDescription(int selectedIndex) {
         if (selectedIndex == 1) {
-            mirrorDescriptionText.setText(
-                    "The current launcher automatically falls back to official Mojang services when a mirror is unavailable."
-            );
+            mirrorDescriptionText.setText(LanguageManager.text(
+                    "settings.source.officialDescription"
+            ));
         } else {
-            mirrorDescriptionText.setText(
-                    "Uses BMCLAPI first for faster downloads in China, then retries with official Mojang services."
-            );
+            mirrorDescriptionText.setText(LanguageManager.text(
+                    "settings.source.autoDescription"
+            ));
         }
     }
 
     private void openGameFolder() {
         if (!Desktop.isDesktopSupported()) {
-            showError("Opening folders is not supported on this system.");
+            showError(LanguageManager.text("settings.folderUnsupported"));
             return;
         }
         try {
             Desktop.getDesktop().open(TCLPaths.MINECRAFT_DIR.toFile());
             settingsStatusText.setText("");
         } catch (IOException | UnsupportedOperationException e) {
-            showError("Could not open the game folder: " + friendlyMessage(e));
+            showError(LanguageManager.text("settings.folderFailed", friendlyMessage(e)));
         }
     }
 
@@ -68,7 +69,7 @@ public final class SettingsController {
 
     private String friendlyMessage(Throwable error) {
         if (error.getMessage() == null || error.getMessage().isBlank()) {
-            return "Unknown error";
+            return LanguageManager.text("common.unknownError");
         }
         return error.getMessage();
     }

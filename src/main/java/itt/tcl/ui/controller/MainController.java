@@ -4,6 +4,7 @@ import itt.tcl.auth.AuthManager;
 import itt.tcl.config.TCLPaths;
 import itt.tcl.launch.GameLauncher;
 import itt.tcl.ui.App;
+import itt.tcl.ui.LanguageManager;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -20,11 +21,10 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public final class MainController {
-    private static final String DEFAULT_STATUS = "Choose an installed version to start playing.";
-
     @FXML private Text accountText;
     @FXML private Text accountTypeText;
     @FXML private Label avatarLabel;
+    @FXML private ComboBox<String> languageCombo;
     @FXML private ComboBox<String> versionCombo;
     @FXML private Text versionCountText;
     @FXML private Button launchBtn;
@@ -35,6 +35,7 @@ public final class MainController {
 
     @FXML
     public void initialize() {
+        configureLanguageSelector();
         loadAccount();
         scanVersions();
 
@@ -47,26 +48,52 @@ public final class MainController {
         progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
     }
 
+    private void configureLanguageSelector() {
+        languageCombo.getItems().setAll(
+                LanguageManager.getAvailableLanguages().stream()
+                        .map(LanguageManager.Language::displayName)
+                        .toList()
+        );
+        languageCombo.getSelectionModel().select(
+                LanguageManager.getLanguage().displayName()
+        );
+        languageCombo.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldLanguage, newLanguage) -> {
+                    if (newLanguage == null) {
+                        return;
+                    }
+                    boolean changed = LanguageManager.setLanguage(
+                            LanguageManager.fromDisplayName(newLanguage)
+                    );
+                    if (changed) {
+                        App.getSceneManager().showMain();
+                    }
+                }
+        );
+    }
+
     private void loadAccount() {
         try {
             AuthManager.AuthResult auth = AuthManager.loadAuth();
             if (auth == null) {
-                showOfflineAccount("Offline Player");
+                showOfflineAccount(LanguageManager.text("account.offlinePlayer"));
                 return;
             }
 
             String username = auth.username();
             accountText.setText(username);
-            accountTypeText.setText("0".equals(auth.accessToken()) ? "Offline account" : "Microsoft account");
+            accountTypeText.setText(LanguageManager.text(
+                    "0".equals(auth.accessToken()) ? "account.offline" : "account.microsoft"
+            ));
             avatarLabel.setText(username.isBlank() ? "?" : username.substring(0, 1).toUpperCase());
         } catch (IOException | RuntimeException e) {
-            showOfflineAccount("Offline Player");
+            showOfflineAccount(LanguageManager.text("account.offlinePlayer"));
         }
     }
 
     private void showOfflineAccount(String username) {
         accountText.setText(username);
-        accountTypeText.setText("Offline account");
+        accountTypeText.setText(LanguageManager.text("account.offline"));
         avatarLabel.setText(username.substring(0, 1).toUpperCase());
     }
 
@@ -79,37 +106,43 @@ public final class MainController {
                     .toList();
 
             versionCombo.getItems().setAll(versions);
-            versionCountText.setText(versions.size() + (versions.size() == 1 ? " version installed" : " versions installed"));
+            versionCountText.setText(LanguageManager.text(
+                    versions.size() == 1 ? "main.versions.one" : "main.versions.many",
+                    versions.size()
+            ));
 
             if (versions.isEmpty()) {
                 launchBtn.setDisable(true);
-                setStatus("No installed versions were found in .minecraft/versions.", "status-warning");
+                setStatus(LanguageManager.text("main.status.noVersions"), "status-warning");
             } else {
                 versionCombo.getSelectionModel().selectFirst();
                 launchBtn.setDisable(false);
-                setStatus(DEFAULT_STATUS, "status-muted");
+                setStatus(LanguageManager.text("main.status.default"), "status-muted");
             }
         } catch (IOException e) {
             launchBtn.setDisable(true);
-            versionCountText.setText("Versions unavailable");
-            setStatus("Could not scan installed versions: " + friendlyMessage(e), "status-error");
+            versionCountText.setText(LanguageManager.text("main.versions.unavailable"));
+            setStatus(
+                    LanguageManager.text("main.status.scanFailed", friendlyMessage(e)),
+                    "status-error"
+            );
         }
     }
 
     private void doLaunch() {
         String version = versionCombo.getValue();
         if (version == null || version.isBlank()) {
-            setStatus("Please select a version before launching.", "status-warning");
+            setStatus(LanguageManager.text("main.status.selectVersion"), "status-warning");
             return;
         }
 
         setLaunchingState(true);
-        setStatus("Preparing " + version + "…", "status-active");
+        setStatus(LanguageManager.text("main.status.preparing", version), "status-active");
 
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
-                updateMessage("Checking game files and downloading anything missing…");
+                updateMessage(LanguageManager.text("main.status.checking"));
                 GameLauncher.launch(version);
                 return null;
             }
@@ -120,13 +153,16 @@ public final class MainController {
         task.setOnSucceeded(e -> {
             statusText.textProperty().unbind();
             setLaunchingState(false);
-            setStatus("Minecraft closed. Ready for another launch.", "status-success");
+            setStatus(LanguageManager.text("main.status.closed"), "status-success");
         });
 
         task.setOnFailed(e -> {
             statusText.textProperty().unbind();
             setLaunchingState(false);
-            setStatus("Launch failed: " + friendlyMessage(task.getException()), "status-error");
+            setStatus(
+                    LanguageManager.text("main.status.launchFailed", friendlyMessage(task.getException())),
+                    "status-error"
+            );
         });
 
         Thread worker = new Thread(task, "tcl-game-launcher");
@@ -136,7 +172,10 @@ public final class MainController {
 
     private void setLaunchingState(boolean launching) {
         launchBtn.setDisable(launching);
-        launchBtn.setText(launching ? "LAUNCHING…" : "LAUNCH GAME");
+        launchBtn.setText(LanguageManager.text(
+                launching ? "main.launching" : "main.launch"
+        ));
+        languageCombo.setDisable(launching);
         versionCombo.setDisable(launching);
         settingsBtn.setDisable(launching);
         logoutBtn.setDisable(launching);
@@ -149,7 +188,10 @@ public final class MainController {
             AuthManager.logout();
             App.getSceneManager().showLogin();
         } catch (IOException e) {
-            setStatus("Could not sign out: " + friendlyMessage(e), "status-error");
+            setStatus(
+                    LanguageManager.text("main.status.logoutFailed", friendlyMessage(e)),
+                    "status-error"
+            );
         }
     }
 
@@ -164,7 +206,7 @@ public final class MainController {
 
     private String friendlyMessage(Throwable error) {
         if (error == null || error.getMessage() == null || error.getMessage().isBlank()) {
-            return "Unknown error";
+            return LanguageManager.text("common.unknownError");
         }
         return error.getMessage();
     }

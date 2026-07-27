@@ -31,18 +31,18 @@
                 </StackPane>
                 <VBox spacing="0">
                     <Text text="TECHCRAFT" styleClass="sidebar-brand-name"/>
-                    <Text text="LAUNCHER" styleClass="sidebar-brand-kicker"/>
+                    <Text text="%brand.launcher" styleClass="sidebar-brand-kicker"/>
                 </VBox>
             </HBox>
 
-            <Text text="LAUNCHER" styleClass="nav-section-label">
+            <Text text="%nav.launcher" styleClass="nav-section-label">
                 <VBox.margin>
                     <Insets top="24"/>
                 </VBox.margin>
             </Text>
-            <Button text="Home" maxWidth="Infinity" alignment="CENTER_LEFT"
+            <Button text="%nav.home" maxWidth="Infinity" alignment="CENTER_LEFT"
                     mnemonicParsing="false" styleClass="nav-button-active"/>
-            <Button fx:id="settingsBtn" text="Settings" maxWidth="Infinity"
+            <Button fx:id="settingsBtn" text="%nav.settings" maxWidth="Infinity"
                     alignment="CENTER_LEFT" mnemonicParsing="false"
                     styleClass="nav-button"/>
 
@@ -55,13 +55,13 @@
                         <Label fx:id="avatarLabel" text="P" styleClass="avatar-text"/>
                     </StackPane>
                     <VBox spacing="2" HBox.hgrow="ALWAYS">
-                        <Text fx:id="accountText" text="Offline Player"
+                        <Text fx:id="accountText" text="%account.offlinePlayer"
                               styleClass="account-name"/>
-                        <Text fx:id="accountTypeText" text="Offline account"
+                        <Text fx:id="accountTypeText" text="%account.offline"
                               styleClass="account-type"/>
                     </VBox>
                 </HBox>
-                <Button fx:id="logoutBtn" text="SIGN OUT" maxWidth="Infinity"
+                <Button fx:id="logoutBtn" text="%account.signOut" maxWidth="Infinity"
                         mnemonicParsing="false" styleClass="signout-button"/>
             </VBox>
         </VBox>
@@ -75,20 +75,29 @@
 
             <HBox alignment="CENTER_LEFT">
                 <VBox spacing="4">
-                    <Text text="Ready to play?" styleClass="page-title"/>
-                    <Text text="Pick a version and jump back into your world."
+                    <Text text="%main.title" styleClass="page-title"/>
+                    <Text text="%main.subtitle"
                           styleClass="page-subtitle"/>
                 </VBox>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Label text="LAUNCHER 1.0" styleClass="version-badge"/>
+                <VBox alignment="CENTER_RIGHT" spacing="4">
+                    <Text text="%main.language" styleClass="language-label"/>
+                    <ComboBox fx:id="languageCombo" prefWidth="118" prefHeight="34"
+                              styleClass="language-combo"/>
+                </VBox>
+                <Label text="%main.badge" styleClass="version-badge">
+                    <HBox.margin>
+                        <Insets left="14"/>
+                    </HBox.margin>
+                </Label>
             </HBox>
 
             <VBox spacing="22" styleClass="launch-card" VBox.vgrow="ALWAYS">
                 <HBox alignment="CENTER_LEFT">
                     <VBox spacing="7">
-                        <Text text="MINECRAFT JAVA EDITION" styleClass="eyebrow-text"/>
-                        <Text text="Build. Explore. Survive." styleClass="hero-title"/>
-                        <Text text="Your selected installation runs in its own isolated game directory."
+                        <Text text="%main.edition" styleClass="eyebrow-text"/>
+                        <Text text="%main.heroTitle" styleClass="hero-title"/>
+                        <Text text="%main.heroDescription"
                               wrappingWidth="470" styleClass="hero-description"/>
                     </VBox>
                     <Region HBox.hgrow="ALWAYS"/>
@@ -102,17 +111,17 @@
 
                 <VBox spacing="9">
                     <HBox alignment="CENTER_LEFT">
-                        <Text text="GAME VERSION" styleClass="field-label"/>
+                        <Text text="%main.gameVersion" styleClass="field-label"/>
                         <Region HBox.hgrow="ALWAYS"/>
-                        <Text fx:id="versionCountText" text="Scanning versions…"
+                        <Text fx:id="versionCountText" text="%main.scanning"
                               styleClass="meta-text"/>
                     </HBox>
-                    <ComboBox fx:id="versionCombo" promptText="Choose an installed version"
+                    <ComboBox fx:id="versionCombo" promptText="%main.chooseVersion"
                               maxWidth="Infinity" prefHeight="46"
                               styleClass="version-combo"/>
                 </VBox>
 
-                <Button fx:id="launchBtn" text="LAUNCH GAME"
+                <Button fx:id="launchBtn" text="%main.launch"
                         maxWidth="Infinity" prefHeight="56"
                         mnemonicParsing="false" styleClass="launch-button"/>
             </VBox>
@@ -124,7 +133,7 @@
                     <Region minWidth="8" minHeight="8" prefWidth="8" prefHeight="8"
                             maxWidth="8" maxHeight="8" styleClass="status-dot"/>
                     <Text fx:id="statusText"
-                          text="Choose an installed version to start playing."
+                          text="%main.status.default"
                           wrappingWidth="590" styleClass="status-text"/>
                 </HBox>
             </VBox>

@@ -32,37 +32,37 @@
                 </StackPane>
                 <VBox spacing="1">
                     <Text text="TECHCRAFT" styleClass="brand-name"/>
-                    <Text text="LAUNCHER" styleClass="brand-kicker"/>
+                    <Text text="%brand.launcher" styleClass="brand-kicker"/>
                 </VBox>
             </HBox>
 
             <Region VBox.vgrow="ALWAYS"/>
 
-            <Text text="Your worlds,&#10;one launch away."
+            <Text text="%login.tagline"
                   wrappingWidth="300" styleClass="display-title"/>
-            <Text text="A focused Minecraft launcher that keeps versions, downloads, and accounts in one clean place."
+            <Text text="%login.description"
                   wrappingWidth="295" styleClass="brand-description"/>
 
             <VBox spacing="12" styleClass="feature-list">
                 <HBox alignment="CENTER_LEFT" spacing="11">
                     <Region minWidth="8" minHeight="8" prefWidth="8" prefHeight="8"
                             maxWidth="8" maxHeight="8" styleClass="feature-dot"/>
-                    <Text text="Version-isolated game folders" styleClass="feature-text"/>
+                    <Text text="%login.feature.isolation" styleClass="feature-text"/>
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="11">
                     <Region minWidth="8" minHeight="8" prefWidth="8" prefHeight="8"
                             maxWidth="8" maxHeight="8" styleClass="feature-dot"/>
-                    <Text text="Accelerated mirror downloads" styleClass="feature-text"/>
+                    <Text text="%login.feature.downloads" styleClass="feature-text"/>
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="11">
                     <Region minWidth="8" minHeight="8" prefWidth="8" prefHeight="8"
                             maxWidth="8" maxHeight="8" styleClass="feature-dot"/>
-                    <Text text="Microsoft and offline profiles" styleClass="feature-text"/>
+                    <Text text="%login.feature.accounts" styleClass="feature-text"/>
                 </HBox>
             </VBox>
 
             <Region VBox.vgrow="ALWAYS"/>
-            <Text text="TECHCRAFT LAUNCHER  •  1.0" styleClass="fine-print"/>
+            <Text text="%brand.version" styleClass="fine-print"/>
         </VBox>
     </left>
 
@@ -73,33 +73,33 @@
             </padding>
 
             <VBox maxWidth="390" spacing="18" styleClass="auth-card">
-                <Text text="Welcome back" styleClass="page-title"/>
-                <Text text="Sign in to continue to your game library." styleClass="page-subtitle"/>
+                <Text text="%login.welcome" styleClass="page-title"/>
+                <Text text="%login.subtitle" styleClass="page-subtitle"/>
 
-                <Button fx:id="msLoginBtn" text="CONTINUE WITH MICROSOFT"
+                <Button fx:id="msLoginBtn" text="%login.microsoft"
                         defaultButton="true" maxWidth="Infinity" prefHeight="48"
                         styleClass="primary-button">
                     <VBox.margin>
                         <Insets top="8"/>
                     </VBox.margin>
                 </Button>
-                <Text text="Uses Microsoft's secure device sign-in flow."
+                <Text text="%login.microsoft.help"
                       styleClass="helper-text"/>
 
                 <HBox alignment="CENTER" spacing="12">
                     <Separator HBox.hgrow="ALWAYS"/>
-                    <Text text="OR PLAY OFFLINE" styleClass="divider-text"/>
+                    <Text text="%login.divider" styleClass="divider-text"/>
                     <Separator HBox.hgrow="ALWAYS"/>
                 </HBox>
 
                 <VBox spacing="8">
-                    <Text text="PLAYER NAME" styleClass="field-label"/>
+                    <Text text="%login.playerName" styleClass="field-label"/>
                     <HBox spacing="10">
                         <TextField fx:id="offlineNameField"
-                                   promptText="Letters, numbers, underscores"
+                                   promptText="%login.usernamePrompt"
                                    prefHeight="44" HBox.hgrow="ALWAYS"
                                    styleClass="input-field"/>
-                        <Button fx:id="offlineLoginBtn" text="PLAY"
+                        <Button fx:id="offlineLoginBtn" text="%login.play"
                                 minWidth="92" prefWidth="92" prefHeight="44"
                                 styleClass="secondary-button"/>
                     </HBox>
@@ -115,7 +115,7 @@
                 </HBox>
 
                 <Region VBox.vgrow="ALWAYS"/>
-                <Label text="Offline mode does not authenticate with online-mode servers."
+                <Label text="%login.offlineNotice"
                        wrapText="true" maxWidth="Infinity" styleClass="notice-label"/>
             </VBox>
         </StackPane>

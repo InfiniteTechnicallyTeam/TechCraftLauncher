@@ -22,15 +22,15 @@ public final class SceneManager {
     }
 
     public void showLogin() {
-        show(new View("/itt/tcl/ui/fxml/login.fxml", "Sign in", 900, 580));
+        show(new View("/itt/tcl/ui/fxml/login.fxml", "window.login", 900, 580));
     }
 
     public void showMain() {
-        show(new View("/itt/tcl/ui/fxml/main.fxml", "Play", 980, 650));
+        show(new View("/itt/tcl/ui/fxml/main.fxml", "window.main", 980, 650));
     }
 
     public void showSettings() {
-        show(new View("/itt/tcl/ui/fxml/settings.fxml", "Settings", 820, 600));
+        show(new View("/itt/tcl/ui/fxml/settings.fxml", "window.settings", 820, 600));
     }
 
     private void show(View view) {
@@ -38,7 +38,7 @@ public final class SceneManager {
             URL fxml = requireResource(view.fxmlPath());
             URL stylesheet = requireResource(STYLESHEET);
 
-            FXMLLoader loader = new FXMLLoader(fxml);
+            FXMLLoader loader = new FXMLLoader(fxml, LanguageManager.bundle());
             Parent root = loader.load();
             Scene scene = stage.getScene();
 
@@ -52,7 +52,7 @@ public final class SceneManager {
             }
 
             scene.getStylesheets().setAll(stylesheet.toExternalForm());
-            stage.setTitle(App.APP_NAME + " — " + view.title());
+            stage.setTitle(App.APP_NAME + " — " + LanguageManager.text(view.titleKey()));
 
             if (stage.isShowing()) {
                 stage.centerOnScreen();
@@ -78,5 +78,5 @@ public final class SceneManager {
         transition.play();
     }
 
-    private record View(String fxmlPath, String title, double width, double height) {}
+    private record View(String fxmlPath, String titleKey, double width, double height) {}
 }

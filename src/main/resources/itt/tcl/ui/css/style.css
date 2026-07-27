@@ -128,6 +128,12 @@
     -fx-fill: #94a3b8;
 }
 
+.language-label {
+    -fx-fill: #526078;
+    -fx-font-size: 8px;
+    -fx-font-weight: 800;
+}
+
 .hero-title {
     -fx-fill: #f8fafc;
     -fx-font-size: 25px;
@@ -452,6 +458,16 @@
 
 .combo-box {
     -fx-padding: 0 7 0 7;
+}
+
+.language-combo {
+    -fx-background-color: rgba(255, 255, 255, 0.035);
+    -fx-border-color: rgba(148, 163, 184, 0.14);
+    -fx-font-size: 11px;
+}
+
+.language-combo:hover {
+    -fx-border-color: rgba(94, 234, 212, 0.28);
 }
 
 .combo-box .list-cell {
