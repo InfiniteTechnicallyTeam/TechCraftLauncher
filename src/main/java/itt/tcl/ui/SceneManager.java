@@ -39,20 +39,25 @@ public final class SceneManager {
             URL stylesheet = requireResource(STYLESHEET);
 
             FXMLLoader loader = new FXMLLoader(fxml, LanguageManager.bundle());
-            Parent root = loader.load();
+            Parent content = loader.load();
+            String title = App.APP_NAME + " — " + LanguageManager.text(view.titleKey());
+            Parent root = WindowChrome.wrap(stage, content, title);
             Scene scene = stage.getScene();
+            double windowHeight = view.height() + WindowChrome.additionalHeight();
 
             if (scene == null) {
-                scene = new Scene(root, view.width(), view.height());
+                scene = new Scene(root, view.width(), windowHeight);
                 stage.setScene(scene);
             } else {
                 scene.setRoot(root);
-                stage.setWidth(view.width());
-                stage.setHeight(view.height());
+                if (!stage.isMaximized()) {
+                    stage.setWidth(view.width());
+                    stage.setHeight(windowHeight);
+                }
             }
 
             scene.getStylesheets().setAll(stylesheet.toExternalForm());
-            stage.setTitle(App.APP_NAME + " — " + LanguageManager.text(view.titleKey()));
+            stage.setTitle(title);
 
             if (stage.isShowing()) {
                 stage.centerOnScreen();

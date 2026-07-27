@@ -66,6 +66,7 @@ public final class App {
     }
 
     private static void configureStage(Stage stage) {
+        WindowChrome.configureStage(stage);
         stage.setTitle(APP_NAME);
         stage.setMinWidth(720);
         stage.setMinHeight(500);

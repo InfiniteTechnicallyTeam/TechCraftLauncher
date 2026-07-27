@@ -3,6 +3,79 @@
     -fx-font-family: "Segoe UI", "Microsoft YaHei UI", sans-serif;
 }
 
+/* Windows window chrome */
+
+.window-frame {
+    -fx-background-color: #0a1020;
+    -fx-border-color: rgba(94, 234, 212, 0.16);
+    -fx-border-width: 1;
+}
+
+.window-title-bar {
+    -fx-background-color:
+        linear-gradient(to right, #0d1628, #101d32 58%, #0d182b);
+    -fx-border-color: transparent transparent rgba(94, 234, 212, 0.16) transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.window-drag-area {
+    -fx-padding: 0 0 0 15;
+}
+
+.window-title {
+    -fx-text-fill: #93a4ba;
+    -fx-font-family: "Segoe UI", "Microsoft YaHei UI", sans-serif;
+    -fx-font-size: 10px;
+    -fx-font-weight: 700;
+}
+
+.window-buttons {
+    -fx-spacing: 0;
+}
+
+.window-button {
+    -fx-min-width: 46;
+    -fx-pref-width: 46;
+    -fx-max-width: 46;
+    -fx-min-height: 39;
+    -fx-pref-height: 39;
+    -fx-max-height: 39;
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-width: 0;
+    -fx-text-fill: #8494aa;
+    -fx-font-family: "Segoe UI Symbol", "Segoe UI", sans-serif;
+    -fx-font-size: 15px;
+    -fx-font-weight: 400;
+    -fx-cursor: hand;
+}
+
+.window-button:hover {
+    -fx-background-color: rgba(94, 234, 212, 0.10);
+    -fx-text-fill: #8bf5e6;
+}
+
+.window-button:pressed {
+    -fx-background-color: rgba(94, 234, 212, 0.17);
+    -fx-translate-y: 0;
+}
+
+.window-close-button {
+    -fx-font-size: 20px;
+    -fx-font-weight: 300;
+}
+
+.window-close-button:hover {
+    -fx-background-color: #e5484d;
+    -fx-text-fill: white;
+}
+
+.window-close-button:pressed {
+    -fx-background-color: #c9363e;
+    -fx-text-fill: white;
+}
+
 /* Brand surfaces */
 
 .brand-panel {
