@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>console</headerType>
+  <jar>D:\InfiniteTechnicallyTeam\TechCraftLauncher\build\libs\TCL-1.0.0.jar</jar>
+  <outfile>D:\InfiniteTechnicallyTeam\TechCraftLauncher\build\libs\TechCraftLauncher.exe</outfile>
+  <errTitle>TechCraftLauncher</errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl>https://adoptium.net/</downloadUrl>
+  <supportUrl></supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <manifest></manifest>
+  <icon></icon>
+  <singleInstance>
+    <mutexName>TechCraftLauncher</mutexName>
+    <windowTitle>TechCraftLauncher</windowTitle>
+  </singleInstance>
+  <jre>
+    <path>%JAVA_HOME%;%PATH%</path>
+    <requiresJdk>false</requiresJdk>
+    <requires64Bit>true</requires64Bit>
+    <minVersion>21</minVersion>
+    <maxVersion></maxVersion>
+    <initialHeapSize>512</initialHeapSize>
+    <maxHeapSize>2048</maxHeapSize>
+    <opt>-Dfile.encoding=UTF-8</opt>
+    <opt>-Dsun.stdout.encoding=UTF-8</opt>
+    <opt>-Dsun.stderr.encoding=UTF-8</opt>
+  </jre>
+  <versionInfo>
+    <fileVersion>1.0.0.0</fileVersion>
+    <txtFileVersion>1.0.0</txtFileVersion>
+    <fileDescription>TechCraftLauncher</fileDescription>
+    <copyright>ITT</copyright>
+    <productVersion>1.0.0.0</productVersion>
+    <txtProductVersion>1.0.0</txtProductVersion>
+    <productName>TechCraftLauncher</productName>
+    <companyName>InfiniteTechnicallyTeam</companyName>
+    <internalName>TechCraftLauncher</internalName>
+    <originalFilename>TechCraftLauncher.exe</originalFilename>
+    <trademarks></trademarks>
+    <language>ENGLISH_US</language>
+  </versionInfo>
+</launch4jConfig>
