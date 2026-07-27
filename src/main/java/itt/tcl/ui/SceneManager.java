@@ -1,40 +1,82 @@
 package itt.tcl.ui;
 
+import javafx.animation.FadeTransition;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.Objects;
 
-public class SceneManager {
+public final class SceneManager {
+    private static final String STYLESHEET = "/itt/tcl/ui/css/style.css";
+    private static final Duration TRANSITION_DURATION = Duration.millis(180);
+
     private final Stage stage;
 
     public SceneManager(Stage stage) {
-        this.stage = stage;
+        this.stage = Objects.requireNonNull(stage, "stage");
     }
 
     public void showLogin() {
-        loadScene("/itt/tcl/ui/fxml/login.fxml", 500, 400);
+        show(new View("/itt/tcl/ui/fxml/login.fxml", "Sign in", 900, 580));
     }
 
     public void showMain() {
-        loadScene("/itt/tcl/ui/fxml/main.fxml", 700, 500);
+        show(new View("/itt/tcl/ui/fxml/main.fxml", "Play", 980, 650));
     }
 
     public void showSettings() {
-        loadScene("/itt/tcl/ui/fxml/settings.fxml", 500, 400);
+        show(new View("/itt/tcl/ui/fxml/settings.fxml", "Settings", 820, 600));
     }
 
-    private void loadScene(String fxmlPath, double width, double height) {
+    private void show(View view) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            URL fxml = requireResource(view.fxmlPath());
+            URL stylesheet = requireResource(STYLESHEET);
+
+            FXMLLoader loader = new FXMLLoader(fxml);
             Parent root = loader.load();
-            Scene scene = new Scene(root, width, height);
-            scene.getStylesheets().add(getClass().getResource("/itt/tcl/ui/css/style.css").toExternalForm());
-            stage.setScene(scene);
+            Scene scene = stage.getScene();
+
+            if (scene == null) {
+                scene = new Scene(root, view.width(), view.height());
+                stage.setScene(scene);
+            } else {
+                scene.setRoot(root);
+                stage.setWidth(view.width());
+                stage.setHeight(view.height());
+            }
+
+            scene.getStylesheets().setAll(stylesheet.toExternalForm());
+            stage.setTitle(App.APP_NAME + " — " + view.title());
+
+            if (stage.isShowing()) {
+                stage.centerOnScreen();
+            }
+            playEntrance(root);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IllegalStateException("Unable to load view: " + view.fxmlPath(), e);
         }
     }
+
+    private URL requireResource(String path) {
+        return Objects.requireNonNull(
+                getClass().getResource(path),
+                () -> "Missing UI resource: " + path
+        );
+    }
+
+    private void playEntrance(Parent root) {
+        root.setOpacity(0);
+        FadeTransition transition = new FadeTransition(TRANSITION_DURATION, root);
+        transition.setFromValue(0);
+        transition.setToValue(1);
+        transition.play();
+    }
+
+    private record View(String fxmlPath, String title, double width, double height) {}
 }

@@ -1,36 +1,123 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
 
-<VBox alignment="CENTER" spacing="20" styleClass="root-pane"
-      xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="itt.tcl.ui.controller.LoginController"
-      prefWidth="500" prefHeight="400">
+<BorderPane prefWidth="900" prefHeight="580" minWidth="720" minHeight="500"
+            styleClass="app-root"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="itt.tcl.ui.controller.LoginController">
 
-    <padding><Insets top="40" right="40" bottom="40" left="40"/></padding>
+    <left>
+        <VBox prefWidth="390" spacing="18" styleClass="brand-panel">
+            <padding>
+                <Insets top="42" right="42" bottom="38" left="42"/>
+            </padding>
 
-    <Text text="TechCraftLauncher" styleClass="title-text"/>
+            <HBox alignment="CENTER_LEFT" spacing="13">
+                <StackPane minWidth="46" minHeight="46" prefWidth="46" prefHeight="46"
+                           maxWidth="46" maxHeight="46" styleClass="brand-mark">
+                    <Text text="TC" styleClass="brand-mark-text"/>
+                </StackPane>
+                <VBox spacing="1">
+                    <Text text="TECHCRAFT" styleClass="brand-name"/>
+                    <Text text="LAUNCHER" styleClass="brand-kicker"/>
+                </VBox>
+            </HBox>
 
-    <Text text="Sign in to start playing" styleClass="subtitle-text"/>
+            <Region VBox.vgrow="ALWAYS"/>
 
-    <Button fx:id="msLoginBtn" text="Microsoft Login" styleClass="primary-btn"
-            prefWidth="300" prefHeight="40"/>
+            <Text text="Your worlds,&#10;one launch away."
+                  wrappingWidth="300" styleClass="display-title"/>
+            <Text text="A focused Minecraft launcher that keeps versions, downloads, and accounts in one clean place."
+                  wrappingWidth="295" styleClass="brand-description"/>
 
-    <Separator prefWidth="300"/>
+            <VBox spacing="12" styleClass="feature-list">
+                <HBox alignment="CENTER_LEFT" spacing="11">
+                    <Region minWidth="8" minHeight="8" prefWidth="8" prefHeight="8"
+                            maxWidth="8" maxHeight="8" styleClass="feature-dot"/>
+                    <Text text="Version-isolated game folders" styleClass="feature-text"/>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" spacing="11">
+                    <Region minWidth="8" minHeight="8" prefWidth="8" prefHeight="8"
+                            maxWidth="8" maxHeight="8" styleClass="feature-dot"/>
+                    <Text text="Accelerated mirror downloads" styleClass="feature-text"/>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" spacing="11">
+                    <Region minWidth="8" minHeight="8" prefWidth="8" prefHeight="8"
+                            maxWidth="8" maxHeight="8" styleClass="feature-dot"/>
+                    <Text text="Microsoft and offline profiles" styleClass="feature-text"/>
+                </HBox>
+            </VBox>
 
-    <Text text="Or play offline" styleClass="label-text"/>
+            <Region VBox.vgrow="ALWAYS"/>
+            <Text text="TECHCRAFT LAUNCHER  •  1.0" styleClass="fine-print"/>
+        </VBox>
+    </left>
 
-    <HBox alignment="CENTER" spacing="10">
-        <TextField fx:id="offlineNameField" promptText="Username" prefWidth="200" prefHeight="35"/>
-        <Button fx:id="offlineLoginBtn" text="Play" styleClass="secondary-btn"
-                prefWidth="80" prefHeight="35"/>
-    </HBox>
+    <center>
+        <StackPane styleClass="auth-surface">
+            <padding>
+                <Insets top="38" right="54" bottom="38" left="54"/>
+            </padding>
 
-    <ProgressIndicator fx:id="progressIndicator" prefWidth="40" prefHeight="40"/>
+            <VBox maxWidth="390" spacing="18" styleClass="auth-card">
+                <Text text="Welcome back" styleClass="page-title"/>
+                <Text text="Sign in to continue to your game library." styleClass="page-subtitle"/>
 
-    <Text fx:id="statusText" styleClass="status-text"/>
-</VBox>
+                <Button fx:id="msLoginBtn" text="CONTINUE WITH MICROSOFT"
+                        defaultButton="true" maxWidth="Infinity" prefHeight="48"
+                        styleClass="primary-button">
+                    <VBox.margin>
+                        <Insets top="8"/>
+                    </VBox.margin>
+                </Button>
+                <Text text="Uses Microsoft's secure device sign-in flow."
+                      styleClass="helper-text"/>
+
+                <HBox alignment="CENTER" spacing="12">
+                    <Separator HBox.hgrow="ALWAYS"/>
+                    <Text text="OR PLAY OFFLINE" styleClass="divider-text"/>
+                    <Separator HBox.hgrow="ALWAYS"/>
+                </HBox>
+
+                <VBox spacing="8">
+                    <Text text="PLAYER NAME" styleClass="field-label"/>
+                    <HBox spacing="10">
+                        <TextField fx:id="offlineNameField"
+                                   promptText="Letters, numbers, underscores"
+                                   prefHeight="44" HBox.hgrow="ALWAYS"
+                                   styleClass="input-field"/>
+                        <Button fx:id="offlineLoginBtn" text="PLAY"
+                                minWidth="92" prefWidth="92" prefHeight="44"
+                                styleClass="secondary-button"/>
+                    </HBox>
+                </VBox>
+
+                <HBox minHeight="34" alignment="CENTER_LEFT" spacing="10">
+                    <ProgressIndicator fx:id="progressIndicator"
+                                       minWidth="22" minHeight="22"
+                                       prefWidth="22" prefHeight="22"
+                                       maxWidth="22" maxHeight="22"/>
+                    <Text fx:id="statusText" wrappingWidth="315"
+                          styleClass="status-text"/>
+                </HBox>
+
+                <Region VBox.vgrow="ALWAYS"/>
+                <Label text="Offline mode does not authenticate with online-mode servers."
+                       wrapText="true" maxWidth="Infinity" styleClass="notice-label"/>
+            </VBox>
+        </StackPane>
+    </center>
+</BorderPane>

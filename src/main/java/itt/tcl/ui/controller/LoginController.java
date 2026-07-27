@@ -1,15 +1,24 @@
 package itt.tcl.ui.controller;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import itt.tcl.auth.AuthManager;
+import itt.tcl.config.TCLPaths;
 import itt.tcl.ui.App;
-import itt.tcl.ui.SceneManager;
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 
-public class LoginController {
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.UUID;
+
+public final class LoginController {
+    private static final int MAX_USERNAME_LENGTH = 16;
+
     @FXML private Button msLoginBtn;
     @FXML private TextField offlineNameField;
     @FXML private Button offlineLoginBtn;
@@ -18,17 +27,25 @@ public class LoginController {
 
     @FXML
     public void initialize() {
+        progressIndicator.setManaged(false);
         progressIndicator.setVisible(false);
 
         msLoginBtn.setOnAction(e -> doMicrosoftLogin());
         offlineLoginBtn.setOnAction(e -> doOfflineLogin());
+        offlineNameField.setOnAction(e -> doOfflineLogin());
+        offlineNameField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.length() > MAX_USERNAME_LENGTH) {
+                offlineNameField.setText(oldValue);
+            }
+            if (!newValue.isBlank()) {
+                clearStatus();
+            }
+        });
     }
 
     private void doMicrosoftLogin() {
-        msLoginBtn.setDisable(true);
-        offlineLoginBtn.setDisable(true);
-        progressIndicator.setVisible(true);
-        statusText.setText("Starting Microsoft login...");
+        setBusy(true);
+        setStatus("Opening Microsoft sign-in in your browser…", "status-active");
 
         Task<Void> task = new Task<>() {
             @Override
@@ -38,43 +55,80 @@ public class LoginController {
             }
         };
 
-        task.setOnSucceeded(e -> Platform.runLater(() -> {
-            progressIndicator.setVisible(false);
-            SceneManager scene = App.getSceneManager();
-            scene.showMain();
-        }));
+        task.setOnSucceeded(e -> App.getSceneManager().showMain());
 
-        task.setOnFailed(e -> Platform.runLater(() -> {
-            progressIndicator.setVisible(false);
-            msLoginBtn.setDisable(false);
-            offlineLoginBtn.setDisable(false);
-            statusText.setText("Login failed: " + task.getException().getMessage());
-        }));
+        task.setOnFailed(e -> {
+            setBusy(false);
+            setStatus("Sign-in failed: " + friendlyMessage(task.getException()), "status-error");
+        });
 
-        new Thread(task).start();
+        Thread worker = new Thread(task, "tcl-microsoft-login");
+        worker.setDaemon(true);
+        worker.start();
     }
 
     private void doOfflineLogin() {
         String name = offlineNameField.getText().trim();
         if (name.isEmpty()) {
-            statusText.setText("Please enter a username.");
+            setStatus("Enter a username to continue offline.", "status-warning");
+            offlineNameField.requestFocus();
             return;
         }
-        // Save offline auth
+        if (!name.matches("[A-Za-z0-9_]{1,16}")) {
+            setStatus("Use 1–16 letters, numbers, or underscores.", "status-warning");
+            offlineNameField.requestFocus();
+            return;
+        }
+
+        setBusy(true);
         try {
-            com.google.gson.JsonObject auth = new com.google.gson.JsonObject();
+            JsonObject auth = new JsonObject();
             auth.addProperty("access_token", "0");
-            auth.addProperty("uuid", "00000000-0000-0000-0000-000000000000");
+            auth.addProperty("uuid", createOfflineUuid(name));
             auth.addProperty("username", name);
             auth.addProperty("client_id", "");
-            java.nio.file.Files.writeString(
-                    itt.tcl.config.TCLPaths.TCL_DIR.resolve("auth.json"),
-                    new com.google.gson.GsonBuilder().setPrettyPrinting().create().toJson(auth)
+            Files.writeString(
+                    TCLPaths.TCL_DIR.resolve("auth.json"),
+                    new GsonBuilder().setPrettyPrinting().create().toJson(auth)
             );
         } catch (Exception ex) {
-            statusText.setText("Error: " + ex.getMessage());
+            setBusy(false);
+            setStatus("Could not create the offline profile: " + friendlyMessage(ex), "status-error");
             return;
         }
         App.getSceneManager().showMain();
+    }
+
+    private String createOfflineUuid(String username) {
+        return UUID.nameUUIDFromBytes(
+                ("OfflinePlayer:" + username).getBytes(StandardCharsets.UTF_8)
+        ).toString();
+    }
+
+    private void setBusy(boolean busy) {
+        msLoginBtn.setDisable(busy);
+        offlineLoginBtn.setDisable(busy);
+        offlineNameField.setDisable(busy);
+        progressIndicator.setManaged(busy);
+        progressIndicator.setVisible(busy);
+    }
+
+    private void clearStatus() {
+        setStatus("", "status-muted");
+    }
+
+    private void setStatus(String message, String styleClass) {
+        statusText.setText(message);
+        statusText.getStyleClass().removeAll(
+                "status-muted", "status-active", "status-success", "status-warning", "status-error"
+        );
+        statusText.getStyleClass().add(styleClass);
+    }
+
+    private String friendlyMessage(Throwable error) {
+        if (error == null || error.getMessage() == null || error.getMessage().isBlank()) {
+            return "Unknown error";
+        }
+        return error.getMessage();
     }
 }
