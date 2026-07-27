@@ -30,20 +30,20 @@
                 </StackPane>
                 <VBox spacing="0">
                     <Text text="TECHCRAFT" styleClass="sidebar-brand-name"/>
-                    <Text text="LAUNCHER" styleClass="sidebar-brand-kicker"/>
+                    <Text text="%brand.launcher" styleClass="sidebar-brand-kicker"/>
                 </VBox>
             </HBox>
 
-            <Text text="PREFERENCES" styleClass="nav-section-label">
+            <Text text="%nav.preferences" styleClass="nav-section-label">
                 <VBox.margin>
                     <Insets top="24"/>
                 </VBox.margin>
             </Text>
-            <Button text="General" maxWidth="Infinity" alignment="CENTER_LEFT"
+            <Button text="%nav.general" maxWidth="Infinity" alignment="CENTER_LEFT"
                     mnemonicParsing="false" styleClass="nav-button-active"/>
 
             <Region VBox.vgrow="ALWAYS"/>
-            <Button fx:id="backBtn" text="BACK TO LAUNCHER"
+            <Button fx:id="backBtn" text="%settings.back"
                     maxWidth="Infinity" cancelButton="true"
                     mnemonicParsing="false" styleClass="secondary-button"/>
         </VBox>
@@ -56,20 +56,20 @@
             </padding>
 
             <VBox spacing="4">
-                <Text text="Settings" styleClass="page-title"/>
-                <Text text="Tune how TechCraft Launcher works on this computer."
+                <Text text="%settings.title" styleClass="page-title"/>
+                <Text text="%settings.subtitle"
                       styleClass="page-subtitle"/>
             </VBox>
 
             <VBox spacing="14" styleClass="settings-card">
                 <HBox alignment="CENTER_LEFT">
                     <VBox spacing="4">
-                        <Text text="Download source" styleClass="card-title"/>
-                        <Text text="Choose the preferred route for game files."
+                        <Text text="%settings.downloadSource" styleClass="card-title"/>
+                        <Text text="%settings.downloadSubtitle"
                               styleClass="card-subtitle"/>
                     </VBox>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Label text="NETWORK" styleClass="setting-tag"/>
+                    <Label text="%settings.network" styleClass="setting-tag"/>
                 </HBox>
                 <ComboBox fx:id="mirrorCombo" maxWidth="Infinity" prefHeight="43"
                           styleClass="version-combo"/>
@@ -80,12 +80,12 @@
             <VBox spacing="14" styleClass="settings-card">
                 <HBox alignment="CENTER_LEFT">
                     <VBox spacing="4">
-                        <Text text="Game data" styleClass="card-title"/>
-                        <Text text="Versions, libraries, assets, and isolated worlds."
+                        <Text text="%settings.gameData" styleClass="card-title"/>
+                        <Text text="%settings.gameDataSubtitle"
                               styleClass="card-subtitle"/>
                     </VBox>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Button fx:id="openFolderBtn" text="OPEN FOLDER"
+                    <Button fx:id="openFolderBtn" text="%settings.openFolder"
                             mnemonicParsing="false" styleClass="ghost-button"/>
                 </HBox>
                 <Label maxWidth="Infinity" styleClass="path-label">
@@ -101,11 +101,11 @@
                     <Text text="TC" styleClass="brand-mark-small-text"/>
                 </StackPane>
                 <VBox spacing="3">
-                    <Text text="TechCraft Launcher 1.0" styleClass="card-title"/>
-                    <Text text="JavaFX desktop edition" styleClass="card-subtitle"/>
+                    <Text text="%settings.about" styleClass="card-title"/>
+                    <Text text="%settings.edition" styleClass="card-subtitle"/>
                 </VBox>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Label text="BUILD 1.0" styleClass="version-badge"/>
+                <Label text="%settings.build" styleClass="version-badge"/>
             </HBox>
 
             <Region VBox.vgrow="ALWAYS"/>
