@@ -40,8 +40,12 @@ public final class SceneManager {
 
             FXMLLoader loader = new FXMLLoader(fxml, LanguageManager.bundle());
             Parent content = loader.load();
+            FontManager.applyLanguageFont(content);
             String title = App.APP_NAME + " — " + LanguageManager.text(view.titleKey());
             Parent root = WindowChrome.wrap(stage, content, title);
+            if (root != content) {
+                FontManager.applyLanguageFont(root);
+            }
             Scene scene = stage.getScene();
             double windowHeight = view.height() + WindowChrome.additionalHeight();
 

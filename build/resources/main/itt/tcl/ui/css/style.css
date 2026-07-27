@@ -24,7 +24,6 @@
 
 .window-title {
     -fx-text-fill: #93a4ba;
-    -fx-font-family: "Segoe UI", "Microsoft YaHei UI", sans-serif;
     -fx-font-size: 10px;
     -fx-font-weight: 700;
 }
