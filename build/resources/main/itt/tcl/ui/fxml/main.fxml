@@ -1,52 +1,133 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
 
-<BorderPane styleClass="root-pane"
+<BorderPane prefWidth="980" prefHeight="650" minWidth="760" minHeight="540"
+            styleClass="app-root"
             xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="itt.tcl.ui.controller.MainController"
-            prefWidth="700" prefHeight="500">
+            fx:controller="itt.tcl.ui.controller.MainController">
 
-    <!-- Top: Account info -->
-    <top>
-        <HBox alignment="CENTER_LEFT" spacing="10" styleClass="top-bar">
-            <padding><Insets top="10" right="20" bottom="10" left="20"/></padding>
-            <Text text="Account:" styleClass="label-text"/>
-            <Text fx:id="accountText" text="Offline" styleClass="accent-text"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Button fx:id="logoutBtn" text="Logout" styleClass="text-btn"/>
-        </HBox>
-    </top>
+    <left>
+        <VBox prefWidth="232" minWidth="210" spacing="14" styleClass="sidebar">
+            <padding>
+                <Insets top="30" right="24" bottom="24" left="24"/>
+            </padding>
 
-    <!-- Center: Version select + Launch -->
+            <HBox alignment="CENTER_LEFT" spacing="11">
+                <StackPane minWidth="38" minHeight="38" prefWidth="38" prefHeight="38"
+                           maxWidth="38" maxHeight="38" styleClass="brand-mark-small">
+                    <Text text="TC" styleClass="brand-mark-small-text"/>
+                </StackPane>
+                <VBox spacing="0">
+                    <Text text="TECHCRAFT" styleClass="sidebar-brand-name"/>
+                    <Text text="LAUNCHER" styleClass="sidebar-brand-kicker"/>
+                </VBox>
+            </HBox>
+
+            <Text text="LAUNCHER" styleClass="nav-section-label">
+                <VBox.margin>
+                    <Insets top="24"/>
+                </VBox.margin>
+            </Text>
+            <Button text="Home" maxWidth="Infinity" alignment="CENTER_LEFT"
+                    mnemonicParsing="false" styleClass="nav-button-active"/>
+            <Button fx:id="settingsBtn" text="Settings" maxWidth="Infinity"
+                    alignment="CENTER_LEFT" mnemonicParsing="false"
+                    styleClass="nav-button"/>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <VBox spacing="12" styleClass="account-card">
+                <HBox alignment="CENTER_LEFT" spacing="11">
+                    <StackPane minWidth="38" minHeight="38" prefWidth="38" prefHeight="38"
+                               maxWidth="38" maxHeight="38" styleClass="avatar">
+                        <Label fx:id="avatarLabel" text="P" styleClass="avatar-text"/>
+                    </StackPane>
+                    <VBox spacing="2" HBox.hgrow="ALWAYS">
+                        <Text fx:id="accountText" text="Offline Player"
+                              styleClass="account-name"/>
+                        <Text fx:id="accountTypeText" text="Offline account"
+                              styleClass="account-type"/>
+                    </VBox>
+                </HBox>
+                <Button fx:id="logoutBtn" text="SIGN OUT" maxWidth="Infinity"
+                        mnemonicParsing="false" styleClass="signout-button"/>
+            </VBox>
+        </VBox>
+    </left>
+
     <center>
-        <VBox alignment="CENTER" spacing="30">
-            <padding><Insets top="20" right="40" bottom="20" left="40"/></padding>
+        <VBox spacing="24" styleClass="content-pane">
+            <padding>
+                <Insets top="38" right="42" bottom="34" left="42"/>
+            </padding>
 
-            <Text text="Select Version" styleClass="subtitle-text"/>
+            <HBox alignment="CENTER_LEFT">
+                <VBox spacing="4">
+                    <Text text="Ready to play?" styleClass="page-title"/>
+                    <Text text="Pick a version and jump back into your world."
+                          styleClass="page-subtitle"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="LAUNCHER 1.0" styleClass="version-badge"/>
+            </HBox>
 
-            <ComboBox fx:id="versionCombo" prefWidth="300" prefHeight="40"
-                      promptText="Choose a version..."/>
+            <VBox spacing="22" styleClass="launch-card" VBox.vgrow="ALWAYS">
+                <HBox alignment="CENTER_LEFT">
+                    <VBox spacing="7">
+                        <Text text="MINECRAFT JAVA EDITION" styleClass="eyebrow-text"/>
+                        <Text text="Build. Explore. Survive." styleClass="hero-title"/>
+                        <Text text="Your selected installation runs in its own isolated game directory."
+                              wrappingWidth="470" styleClass="hero-description"/>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <StackPane minWidth="92" minHeight="92" prefWidth="92" prefHeight="92"
+                               maxWidth="92" maxHeight="92" styleClass="block-emblem">
+                        <Text text="TCL" styleClass="block-emblem-text"/>
+                    </StackPane>
+                </HBox>
 
-            <Button fx:id="launchBtn" text="Launch Game" styleClass="launch-btn"
-                    prefWidth="300" prefHeight="50"/>
+                <Region VBox.vgrow="ALWAYS"/>
 
-            <ProgressBar fx:id="progressBar" prefWidth="300" visible="false"/>
+                <VBox spacing="9">
+                    <HBox alignment="CENTER_LEFT">
+                        <Text text="GAME VERSION" styleClass="field-label"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Text fx:id="versionCountText" text="Scanning versions…"
+                              styleClass="meta-text"/>
+                    </HBox>
+                    <ComboBox fx:id="versionCombo" promptText="Choose an installed version"
+                              maxWidth="Infinity" prefHeight="46"
+                              styleClass="version-combo"/>
+                </VBox>
 
-            <Text fx:id="statusText" styleClass="status-text"/>
+                <Button fx:id="launchBtn" text="LAUNCH GAME"
+                        maxWidth="Infinity" prefHeight="56"
+                        mnemonicParsing="false" styleClass="launch-button"/>
+            </VBox>
+
+            <VBox spacing="10" styleClass="status-panel">
+                <ProgressBar fx:id="progressBar" maxWidth="Infinity"
+                             visible="false" managed="false"/>
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Region minWidth="8" minHeight="8" prefWidth="8" prefHeight="8"
+                            maxWidth="8" maxHeight="8" styleClass="status-dot"/>
+                    <Text fx:id="statusText"
+                          text="Choose an installed version to start playing."
+                          wrappingWidth="590" styleClass="status-text"/>
+                </HBox>
+            </VBox>
         </VBox>
     </center>
-
-    <!-- Bottom: Settings -->
-    <bottom>
-        <HBox alignment="CENTER" spacing="10" styleClass="bottom-bar">
-            <padding><Insets top="10" right="20" bottom="15" left="20"/></padding>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Button fx:id="settingsBtn" text="Settings" styleClass="text-btn"/>
-        </HBox>
-    </bottom>
 </BorderPane>

@@ -1,29 +1,116 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
 
-<VBox spacing="20" styleClass="root-pane"
-      xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="itt.tcl.ui.controller.SettingsController"
-      prefWidth="500" prefHeight="400">
+<BorderPane prefWidth="820" prefHeight="600" minWidth="720" minHeight="520"
+            styleClass="app-root"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="itt.tcl.ui.controller.SettingsController">
 
-    <padding><Insets top="30" right="40" bottom="30" left="40"/></padding>
+    <left>
+        <VBox prefWidth="210" minWidth="190" spacing="14" styleClass="sidebar">
+            <padding>
+                <Insets top="30" right="24" bottom="24" left="24"/>
+            </padding>
 
-    <Text text="Settings" styleClass="title-text"/>
+            <HBox alignment="CENTER_LEFT" spacing="11">
+                <StackPane minWidth="38" minHeight="38" prefWidth="38" prefHeight="38"
+                           maxWidth="38" maxHeight="38" styleClass="brand-mark-small">
+                    <Text text="TC" styleClass="brand-mark-small-text"/>
+                </StackPane>
+                <VBox spacing="0">
+                    <Text text="TECHCRAFT" styleClass="sidebar-brand-name"/>
+                    <Text text="LAUNCHER" styleClass="sidebar-brand-kicker"/>
+                </VBox>
+            </HBox>
 
-    <Separator/>
+            <Text text="PREFERENCES" styleClass="nav-section-label">
+                <VBox.margin>
+                    <Insets top="24"/>
+                </VBox.margin>
+            </Text>
+            <Button text="General" maxWidth="Infinity" alignment="CENTER_LEFT"
+                    mnemonicParsing="false" styleClass="nav-button-active"/>
 
-    <VBox spacing="8">
-        <Text text="Mirror Source" styleClass="label-text"/>
-        <ComboBox fx:id="mirrorCombo" prefWidth="300" prefHeight="35"/>
-    </VBox>
+            <Region VBox.vgrow="ALWAYS"/>
+            <Button fx:id="backBtn" text="BACK TO LAUNCHER"
+                    maxWidth="Infinity" cancelButton="true"
+                    mnemonicParsing="false" styleClass="secondary-button"/>
+        </VBox>
+    </left>
 
-    <Region VBox.vgrow="ALWAYS"/>
+    <center>
+        <VBox spacing="20" styleClass="content-pane">
+            <padding>
+                <Insets top="36" right="38" bottom="30" left="38"/>
+            </padding>
 
-    <Button fx:id="backBtn" text="Back" styleClass="secondary-btn"
-            prefWidth="150" prefHeight="35"/>
-</VBox>
+            <VBox spacing="4">
+                <Text text="Settings" styleClass="page-title"/>
+                <Text text="Tune how TechCraft Launcher works on this computer."
+                      styleClass="page-subtitle"/>
+            </VBox>
+
+            <VBox spacing="14" styleClass="settings-card">
+                <HBox alignment="CENTER_LEFT">
+                    <VBox spacing="4">
+                        <Text text="Download source" styleClass="card-title"/>
+                        <Text text="Choose the preferred route for game files."
+                              styleClass="card-subtitle"/>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label text="NETWORK" styleClass="setting-tag"/>
+                </HBox>
+                <ComboBox fx:id="mirrorCombo" maxWidth="Infinity" prefHeight="43"
+                          styleClass="version-combo"/>
+                <Text fx:id="mirrorDescriptionText" wrappingWidth="500"
+                      styleClass="helper-text"/>
+            </VBox>
+
+            <VBox spacing="14" styleClass="settings-card">
+                <HBox alignment="CENTER_LEFT">
+                    <VBox spacing="4">
+                        <Text text="Game data" styleClass="card-title"/>
+                        <Text text="Versions, libraries, assets, and isolated worlds."
+                              styleClass="card-subtitle"/>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="openFolderBtn" text="OPEN FOLDER"
+                            mnemonicParsing="false" styleClass="ghost-button"/>
+                </HBox>
+                <Label maxWidth="Infinity" styleClass="path-label">
+                    <graphic>
+                        <Text fx:id="dataPathText" text=".minecraft" styleClass="path-text"/>
+                    </graphic>
+                </Label>
+            </VBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="16" styleClass="about-card">
+                <StackPane minWidth="50" minHeight="50" prefWidth="50" prefHeight="50"
+                           maxWidth="50" maxHeight="50" styleClass="brand-mark-small">
+                    <Text text="TC" styleClass="brand-mark-small-text"/>
+                </StackPane>
+                <VBox spacing="3">
+                    <Text text="TechCraft Launcher 1.0" styleClass="card-title"/>
+                    <Text text="JavaFX desktop edition" styleClass="card-subtitle"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="BUILD 1.0" styleClass="version-badge"/>
+            </HBox>
+
+            <Region VBox.vgrow="ALWAYS"/>
+            <Text fx:id="settingsStatusText" wrappingWidth="500"
+                  styleClass="status-text"/>
+        </VBox>
+    </center>
+</BorderPane>
