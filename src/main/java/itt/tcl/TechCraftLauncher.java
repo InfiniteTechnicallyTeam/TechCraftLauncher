@@ -15,11 +15,14 @@ public class TechCraftLauncher {
 
         // GUI mode
         if (args.length > 0 && "--gui".equals(args[0])) {
-            App.launchGUI();
+            App.launchGUI(false);
             return;
         }
 
-        if (args.length > 0) { handleCommand(String.join(" ", args)); return; }
+        if (args.length > 0) {
+            handleCommand(String.join(" ", args), false);
+            return;
+        }
 
         System.out.println("TechCraftLauncher v1.0 - CLI mode");
         System.out.println("Type 'help' for help, 'exit' to quit.");
@@ -29,14 +32,16 @@ public class TechCraftLauncher {
             String line = scanner.nextLine().trim();
             if (line.isEmpty()) continue;
             if ("exit".equalsIgnoreCase(line) || "quit".equalsIgnoreCase(line)) {
-                System.out.println("Goodbye!"); break;
+                App.shutdownGUI();
+                System.out.println("Goodbye!");
+                break;
             }
-            handleCommand(line);
+            handleCommand(line, true);
         }
         scanner.close();
     }
 
-    private static void handleCommand(String input) {
+    private static void handleCommand(String input, boolean interactive) {
         String[] parts = input.split("\\s+");
         String cmd = parts[0].toLowerCase();
         try {
@@ -63,7 +68,7 @@ public class TechCraftLauncher {
                 }
                 case "login" -> AuthManager.login();
                 case "logout" -> AuthManager.logout();
-                case "gui" -> App.launchGUI();
+                case "gui" -> App.launchGUI(interactive);
                 case "whoami" -> {
                     if (AuthManager.isLoggedIn()) {
                         System.out.println(AuthManager.getUsername());
