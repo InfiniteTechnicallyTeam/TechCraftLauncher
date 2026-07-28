@@ -25,6 +25,10 @@ public final class WindowChrome {
             System.getProperty("os.name", "").toLowerCase().startsWith("win");
     private static final Map<Stage, ChangeListener<Boolean>> MAXIMIZE_LISTENERS =
             new WeakHashMap<>();
+    private static final Map<Stage, Label> TITLE_LABELS =
+            new WeakHashMap<>();
+    private static final Map<Stage, ChromeButtons> CHROME_BUTTONS =
+            new WeakHashMap<>();
 
     private WindowChrome() {}
 
@@ -45,6 +49,7 @@ public final class WindowChrome {
 
         Label titleLabel = new Label(title);
         titleLabel.getStyleClass().add("window-title");
+        TITLE_LABELS.put(stage, titleLabel);
 
         HBox dragArea = new HBox(titleLabel);
         dragArea.setAlignment(Pos.CENTER_LEFT);
@@ -59,6 +64,10 @@ public final class WindowChrome {
         );
         Button closeButton = createWindowButton(
                 "×", "window-close-button", LanguageManager.text("window.close")
+        );
+        CHROME_BUTTONS.put(
+                stage,
+                new ChromeButtons(minimizeButton, maximizeButton, closeButton)
         );
 
         minimizeButton.setOnAction(event -> stage.setIconified(true));
@@ -86,6 +95,31 @@ public final class WindowChrome {
         installWindowDragging(stage, dragArea);
         installWindowResizing(stage, frame);
         return frame;
+    }
+
+    public static void updateTitle(Stage stage, String title) {
+        stage.setTitle(title);
+        Label titleLabel = TITLE_LABELS.get(stage);
+        if (titleLabel != null) {
+            titleLabel.setText(title);
+        }
+        ChromeButtons buttons = CHROME_BUTTONS.get(stage);
+        if (buttons != null) {
+            updateButtonLabel(
+                    buttons.minimize(),
+                    LanguageManager.text("window.minimize")
+            );
+            updateMaximizeButton(buttons.maximize(), stage.isMaximized());
+            updateButtonLabel(
+                    buttons.close(),
+                    LanguageManager.text("window.close")
+            );
+        }
+    }
+
+    private static void updateButtonLabel(Button button, String label) {
+        button.setAccessibleText(label);
+        button.getTooltip().setText(label);
     }
 
     private static Button createWindowButton(String symbol, String styleClass, String tooltipText) {
@@ -263,6 +297,12 @@ public final class WindowChrome {
         private double stageWidth;
         private double stageHeight;
     }
+
+    private record ChromeButtons(
+            Button minimize,
+            Button maximize,
+            Button close
+    ) {}
 
     private enum ResizeDirection {
         NONE(Cursor.DEFAULT, false, false, false, false),

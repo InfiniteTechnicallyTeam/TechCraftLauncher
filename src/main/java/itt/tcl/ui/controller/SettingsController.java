@@ -17,7 +17,8 @@ public final class SettingsController {
     @FXML private Text dataPathText;
     @FXML private Text settingsStatusText;
     @FXML private Button openFolderBtn;
-    @FXML private Button backBtn;
+    @FXML private Button homeBtn;
+    @FXML private Button downloadsBtn;
 
     @FXML
     public void initialize() {
@@ -33,7 +34,8 @@ public final class SettingsController {
                 (observable, oldIndex, newIndex) -> updateMirrorDescription(newIndex.intValue())
         );
         openFolderBtn.setOnAction(e -> openGameFolder());
-        backBtn.setOnAction(e -> App.getSceneManager().showMain());
+        homeBtn.setOnAction(e -> App.getSceneManager().showMain());
+        downloadsBtn.setOnAction(e -> App.getSceneManager().showDownloads());
     }
 
     private void updateMirrorDescription(int selectedIndex) {

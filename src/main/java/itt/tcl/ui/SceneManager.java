@@ -1,9 +1,13 @@
 package itt.tcl.ui;
 
 import javafx.animation.FadeTransition;
+import javafx.animation.Interpolator;
+import javafx.animation.ParallelTransition;
+import javafx.animation.TranslateTransition;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -13,9 +17,13 @@ import java.util.Objects;
 
 public final class SceneManager {
     private static final String STYLESHEET = "/itt/tcl/ui/css/style.css";
-    private static final Duration TRANSITION_DURATION = Duration.millis(180);
+    private static final Duration TRANSITION_DURATION = Duration.millis(210);
 
     private final Stage stage;
+    private StackPane contentHost;
+    private Parent windowRoot;
+    private Object currentController;
+    private ParallelTransition activeTransition;
 
     public SceneManager(Stage stage) {
         this.stage = Objects.requireNonNull(stage, "stage");
@@ -26,11 +34,11 @@ public final class SceneManager {
     }
 
     public void showMain() {
-        show(new View("/itt/tcl/ui/fxml/main.fxml", "window.main", 980, 650));
+        show(new View("/itt/tcl/ui/fxml/main.fxml", "window.main", 1080, 720));
     }
 
     public void showSettings() {
-        show(new View("/itt/tcl/ui/fxml/settings.fxml", "window.settings", 820, 600));
+        show(new View("/itt/tcl/ui/fxml/settings.fxml", "window.settings", 1080, 720));
     }
 
     public void showDownloads() {
@@ -47,20 +55,30 @@ public final class SceneManager {
 
             FXMLLoader loader = new FXMLLoader(fxml, LanguageManager.bundle());
             Parent content = loader.load();
+            Object nextController = loader.getController();
             FontManager.applyLanguageFont(content);
             String title = App.APP_NAME + " — " + LanguageManager.text(view.titleKey());
-            Parent root = WindowChrome.wrap(stage, content, title);
-            if (root != content) {
-                FontManager.applyLanguageFont(root);
-            }
             Scene scene = stage.getScene();
             double windowHeight = view.height() + WindowChrome.additionalHeight();
+            boolean firstView = contentHost == null;
 
-            if (scene == null) {
-                scene = new Scene(root, view.width(), windowHeight);
+            if (currentController instanceof ViewLifecycle lifecycle) {
+                lifecycle.onViewHidden();
+            }
+
+            if (firstView) {
+                contentHost = new StackPane(content);
+                windowRoot = WindowChrome.wrap(stage, contentHost, title);
+                if (windowRoot != contentHost) {
+                    FontManager.applyLanguageFont(windowRoot);
+                }
+                scene = new Scene(windowRoot, view.width(), windowHeight);
                 stage.setScene(scene);
             } else {
-                scene.setRoot(root);
+                if (activeTransition != null) {
+                    activeTransition.stop();
+                }
+                contentHost.getChildren().setAll(content);
                 if (!stage.isMaximized()) {
                     stage.setWidth(view.width());
                     stage.setHeight(windowHeight);
@@ -68,13 +86,19 @@ public final class SceneManager {
             }
 
             scene.getStylesheets().setAll(stylesheet.toExternalForm());
-            stage.setTitle(title);
+            WindowChrome.updateTitle(stage, title);
 
             if (preservePosition && !stage.isMaximized()) {
                 stage.setX(previousX);
                 stage.setY(previousY);
             }
-            playEntrance(root);
+            currentController = nextController;
+            if (currentController instanceof ViewLifecycle lifecycle) {
+                lifecycle.onViewShown();
+            }
+            if (!firstView) {
+                playEntrance(content);
+            }
         } catch (IOException e) {
             throw new IllegalStateException("Unable to load view: " + view.fxmlPath(), e);
         }
@@ -88,11 +112,24 @@ public final class SceneManager {
     }
 
     private void playEntrance(Parent root) {
-        root.setOpacity(0);
+        root.setOpacity(0.92);
+        root.setTranslateX(12);
         FadeTransition transition = new FadeTransition(TRANSITION_DURATION, root);
-        transition.setFromValue(0);
+        transition.setFromValue(0.92);
         transition.setToValue(1);
-        transition.play();
+        transition.setInterpolator(Interpolator.EASE_OUT);
+
+        TranslateTransition movement = new TranslateTransition(
+                TRANSITION_DURATION,
+                root
+        );
+        movement.setFromX(12);
+        movement.setToX(0);
+        movement.setInterpolator(Interpolator.EASE_OUT);
+
+        activeTransition = new ParallelTransition(transition, movement);
+        activeTransition.setOnFinished(event -> activeTransition = null);
+        activeTransition.play();
     }
 
     private record View(String fxmlPath, String titleKey, double width, double height) {}

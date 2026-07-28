@@ -9,11 +9,15 @@ import itt.tcl.download.DownloadCatalogService.LoaderVersion;
 import itt.tcl.download.DownloadCatalogService.OptiFineVersion;
 import itt.tcl.download.DownloadCatalogService.ProjectFile;
 import itt.tcl.download.DownloadCatalogService.ProjectResult;
+import itt.tcl.download.DownloadProgressTracker;
+import itt.tcl.download.DownloadProgressTracker.Snapshot;
 import itt.tcl.download.LoaderInstallService;
 import itt.tcl.download.LoaderType;
 import itt.tcl.download.ProjectSource;
 import itt.tcl.ui.App;
 import itt.tcl.ui.LanguageManager;
+import itt.tcl.ui.ViewLifecycle;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -36,9 +40,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public final class DownloadController {
+public final class DownloadController implements ViewLifecycle {
     @FXML private Button homeBtn;
     @FXML private Button settingsBtn;
 
@@ -76,13 +81,20 @@ public final class DownloadController {
 
     @FXML private ProgressBar downloadProgress;
     @FXML private Text downloadStatusText;
+    @FXML private Text downloadMetricsText;
 
     private final DownloadCatalogService catalog =
             new DownloadCatalogService();
     private final LoaderInstallService installer =
             new LoaderInstallService(catalog);
     private final AtomicInteger catalogRequest = new AtomicInteger();
+    private final DownloadProgressTracker progressTracker =
+            DownloadProgressTracker.getInstance();
+    private final Consumer<Snapshot> progressListener =
+            this::handleProgressSnapshot;
+    private volatile boolean localBusy;
     private volatile boolean busy;
+    private volatile boolean viewActive;
 
     @FXML
     public void initialize() {
@@ -103,9 +115,24 @@ public final class DownloadController {
         downloadProgress.setManaged(false);
         downloadProgress.setVisible(false);
         downloadProgress.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+        downloadMetricsText.setManaged(false);
+        downloadMetricsText.setVisible(false);
         showStatus(LanguageManager.text("download.status.loadingCatalog"), "status-active");
         reloadInstalledTargets();
         loadGameCatalog();
+    }
+
+    @Override
+    public void onViewShown() {
+        viewActive = true;
+        progressTracker.addListener(progressListener);
+        handleProgressSnapshot(progressTracker.snapshot());
+    }
+
+    @Override
+    public void onViewHidden() {
+        viewActive = false;
+        progressTracker.removeListener(progressListener);
     }
 
     private void configureTabs() {
@@ -416,6 +443,16 @@ public final class DownloadController {
             return;
         }
 
+        String initialStatus = LanguageManager.text(
+                "download.status.installingVanilla"
+        );
+        if (!progressTracker.beginOperation(initialStatus)) {
+            showStatus(
+                    LanguageManager.text("download.status.operationInProgress"),
+                    "status-warning"
+            );
+            return;
+        }
         setBusy(true);
         Task<LoaderInstallService.InstallResult> task = new Task<>() {
             @Override
@@ -425,41 +462,50 @@ public final class DownloadController {
                         loader,
                         loaderVersion == null ? "" : loaderVersion.version(),
                         optiFine,
-                        key -> updateMessage(LanguageManager.text(key))
+                        key -> {
+                            String message = LanguageManager.text(key);
+                            updateMessage(message);
+                            progressTracker.updateStatus(message);
+                        }
                 );
             }
         };
-        downloadStatusText.textProperty().bind(task.messageProperty());
         task.setOnSucceeded(event -> {
-            downloadStatusText.textProperty().unbind();
-            setBusy(false);
             reloadInstalledTargets();
             LoaderInstallService.InstallResult result = task.getValue();
+            String finalMessage;
+            String styleClass;
             if (result.externalInstallerOpened()) {
                 String key = result.optiFineFile() == null
                         ? "download.status.installerOpened"
                         : "download.status.installerOpenedWithOptiFine";
-                showStatus(LanguageManager.text(
+                finalMessage = LanguageManager.text(
                         key,
                         TCLPaths.MINECRAFT_DIR.toAbsolutePath().normalize(),
                         result.optiFineFile() == null
                                 ? ""
                                 : result.optiFineFile().toAbsolutePath().normalize()
-                ), "status-warning");
+                );
+                styleClass = "status-warning";
             } else {
-                showStatus(LanguageManager.text(
+                finalMessage = LanguageManager.text(
                         "download.status.installed",
                         result.versionId()
-                ), "status-success");
+                );
+                styleClass = "status-success";
             }
+            progressTracker.completeOperation(finalMessage);
+            setBusy(false);
+            showStatus(finalMessage, styleClass);
         });
         task.setOnFailed(event -> {
-            downloadStatusText.textProperty().unbind();
-            setBusy(false);
-            showStatus(LanguageManager.text(
+            String finalMessage = LanguageManager.text(
                     "download.status.installFailed",
                     friendlyMessage(task.getException())
-            ), "status-error");
+            );
+            progressTracker.failOperation(finalMessage);
+            setBusy(false);
+            showStatus(finalMessage, "status-error");
         });
         start(task, "tcl-version-installer");
     }
@@ -609,11 +655,18 @@ public final class DownloadController {
             );
             return;
         }
-        setBusy(true);
-        showStatus(LanguageManager.text(
+        String resolvingStatus = LanguageManager.text(
                 "download.status.resolvingFile",
                 project.title()
-        ), "status-active");
+        );
+        if (!progressTracker.beginOperation(resolvingStatus)) {
+            showStatus(
+                    LanguageManager.text("download.status.operationInProgress"),
+                    "status-warning"
+            );
+            return;
+        }
+        setBusy(true);
         Task<Path> task = new Task<>() {
             @Override
             protected Path call() throws Exception {
@@ -624,10 +677,12 @@ public final class DownloadController {
                         game.id(),
                         loader
                 );
-                updateMessage(LanguageManager.text(
+                String downloadMessage = LanguageManager.text(
                         "download.status.downloadingProject",
                         file.filename()
-                ));
+                );
+                updateMessage(downloadMessage);
+                progressTracker.updateStatus(downloadMessage);
                 Files.createDirectories(destinationDirectory);
                 Path destination = destinationDirectory.resolve(file.filename());
                 catalog.downloadProjectFile(
@@ -638,22 +693,23 @@ public final class DownloadController {
                 return destination;
             }
         };
-        downloadStatusText.textProperty().bind(task.messageProperty());
         task.setOnSucceeded(event -> {
-            downloadStatusText.textProperty().unbind();
-            setBusy(false);
-            showStatus(LanguageManager.text(
+            String finalMessage = LanguageManager.text(
                     "download.status.projectDownloaded",
                     task.getValue().toAbsolutePath().normalize()
-            ), "status-success");
+            );
+            progressTracker.completeOperation(finalMessage);
+            setBusy(false);
+            showStatus(finalMessage, "status-success");
         });
         task.setOnFailed(event -> {
-            downloadStatusText.textProperty().unbind();
-            setBusy(false);
-            showStatus(LanguageManager.text(
+            String finalMessage = LanguageManager.text(
                     "download.status.projectFailed",
                     friendlyMessage(task.getException())
-            ), "status-error");
+            );
+            progressTracker.failOperation(finalMessage);
+            setBusy(false);
+            showStatus(finalMessage, "status-error");
         });
         start(task, threadName);
     }
@@ -726,9 +782,20 @@ public final class DownloadController {
     }
 
     private void setBusy(boolean value) {
+        localBusy = value;
+        Snapshot snapshot = progressTracker.snapshot();
+        applyBusyState(value || snapshot.active());
+        if (!snapshot.active()) {
+            downloadProgress.setManaged(value);
+            downloadProgress.setVisible(value);
+            downloadProgress.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+            downloadMetricsText.setManaged(false);
+            downloadMetricsText.setVisible(false);
+        }
+    }
+
+    private void applyBusyState(boolean value) {
         busy = value;
-        downloadProgress.setManaged(value);
-        downloadProgress.setVisible(value);
         gameTabBtn.setDisable(value);
         modsTabBtn.setDisable(value);
         packsTabBtn.setDisable(value);
@@ -749,7 +816,99 @@ public final class DownloadController {
         }
     }
 
+    private void handleProgressSnapshot(Snapshot snapshot) {
+        if (!viewActive) {
+            return;
+        }
+        if (!Platform.isFxApplicationThread()) {
+            Platform.runLater(() -> {
+                if (viewActive) {
+                    renderProgressSnapshot(snapshot);
+                }
+            });
+            return;
+        }
+        renderProgressSnapshot(snapshot);
+    }
+
+    private void renderProgressSnapshot(Snapshot snapshot) {
+        applyBusyState(localBusy || snapshot.active());
+        if (snapshot.active()) {
+            downloadProgress.setManaged(true);
+            downloadProgress.setVisible(true);
+            downloadProgress.setProgress(
+                    snapshot.progress() < 0.0
+                            ? ProgressBar.INDETERMINATE_PROGRESS
+                            : snapshot.progress()
+            );
+            downloadMetricsText.setManaged(true);
+            downloadMetricsText.setVisible(true);
+            String fileName = snapshot.fileName().isBlank()
+                    ? LanguageManager.text("download.progress.preparing")
+                    : snapshot.fileName();
+            double megabytesPerSecond =
+                    snapshot.bytesPerSecond() / 1024.0 / 1024.0;
+            if (snapshot.totalBytes() > 0L) {
+                int percent = (int) Math.round(snapshot.progress() * 100.0);
+                downloadMetricsText.setText(LanguageManager.text(
+                        "download.progress.details",
+                        percent,
+                        formatMegabytes(snapshot.downloadedBytes()),
+                        formatMegabytes(snapshot.totalBytes()),
+                        String.format(Locale.ROOT, "%.2f", megabytesPerSecond),
+                        fileName
+                ));
+            } else {
+                downloadMetricsText.setText(LanguageManager.text(
+                        "download.progress.unknown",
+                        formatMegabytes(snapshot.downloadedBytes()),
+                        String.format(Locale.ROOT, "%.2f", megabytesPerSecond),
+                        fileName
+                ));
+            }
+            applyStatus(snapshot.status(), "status-active");
+            return;
+        }
+
+        if (localBusy) {
+            downloadProgress.setManaged(true);
+            downloadProgress.setVisible(true);
+            downloadProgress.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+        } else {
+            downloadProgress.setManaged(false);
+            downloadProgress.setVisible(false);
+        }
+        downloadMetricsText.setManaged(false);
+        downloadMetricsText.setVisible(false);
+        if (!snapshot.status().isBlank()
+                && snapshot.state() != DownloadProgressTracker.State.IDLE) {
+            applyStatus(
+                    snapshot.status(),
+                    snapshot.state() == DownloadProgressTracker.State.FAILED
+                            ? "status-error"
+                            : "status-success"
+            );
+        }
+    }
+
+    private static String formatMegabytes(long bytes) {
+        return String.format(
+                Locale.ROOT,
+                "%.1f",
+                Math.max(0L, bytes) / 1024.0 / 1024.0
+        );
+    }
+
     private void showStatus(String message, String styleClass) {
+        Snapshot snapshot = progressTracker.snapshot();
+        if (snapshot.active() && viewActive) {
+            renderProgressSnapshot(snapshot);
+            return;
+        }
+        applyStatus(message, styleClass);
+    }
+
+    private void applyStatus(String message, String styleClass) {
         downloadStatusText.textProperty().unbind();
         downloadStatusText.setText(message);
         downloadStatusText.getStyleClass().removeAll(

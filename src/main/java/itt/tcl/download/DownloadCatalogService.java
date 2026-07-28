@@ -9,21 +9,18 @@ import itt.tcl.version.VersionInstaller;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.function.Predicate;
 
 public final class DownloadCatalogService {
@@ -431,31 +428,15 @@ public final class DownloadCatalogService {
             Path destination,
             String apiKey
     ) throws Exception {
-        Files.createDirectories(destination.getParent());
-        HttpRequest request = HttpRequest.newBuilder(URI.create(url))
-                .timeout(Duration.ofMinutes(5))
-                .header("Accept", "application/octet-stream, */*")
-                .header("User-Agent", USER_AGENT)
-                .header("x-api-key", apiKey)
-                .GET()
-                .build();
-        HttpResponse<InputStream> response = HttpHelper.getClient().send(
-                request,
-                HttpResponse.BodyHandlers.ofInputStream()
+        DownloadManager.downloadFileSilent(
+                url,
+                destination,
+                Map.of(
+                        "Accept", "application/octet-stream, */*",
+                        "User-Agent", USER_AGENT,
+                        "x-api-key", apiKey
+                )
         );
-        if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            response.body().close();
-            Files.deleteIfExists(destination);
-            throw new IOException(
-                    "CurseForge download failed (" + response.statusCode() + ")"
-            );
-        }
-        try (InputStream input = response.body()) {
-            Files.copy(input, destination, StandardCopyOption.REPLACE_EXISTING);
-        } catch (Exception error) {
-            Files.deleteIfExists(destination);
-            throw error;
-        }
     }
 
     public String optiFineDownloadUrl(OptiFineVersion version) {
