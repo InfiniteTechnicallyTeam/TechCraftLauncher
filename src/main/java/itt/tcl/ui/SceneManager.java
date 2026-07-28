@@ -33,6 +33,10 @@ public final class SceneManager {
         show(new View("/itt/tcl/ui/fxml/settings.fxml", "window.settings", 820, 600));
     }
 
+    public void showDownloads() {
+        show(new View("/itt/tcl/ui/fxml/download.fxml", "window.downloads", 1080, 720));
+    }
+
     private void show(View view) {
         try {
             URL fxml = requireResource(view.fxmlPath());

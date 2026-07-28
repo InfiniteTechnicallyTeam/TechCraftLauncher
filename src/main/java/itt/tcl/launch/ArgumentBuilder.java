@@ -14,13 +14,9 @@ public class ArgumentBuilder {
 
     public static LaunchArgs build(String versionId, VersionManifest manifest, Path nativesDir) throws IOException {
         List<String> cp = manifest.getLibrariesClasspath();
-        String classpathStr = String.join(";", cp);
+        String classpathStr = String.join(File.pathSeparator, cp);
 
         List<String> argsList = new ArrayList<>();
-        argsList.add("-Djava.library.path=" + nativesDir.toAbsolutePath().normalize());
-        argsList.add("-cp");
-        argsList.add(classpathStr);
-        argsList.add(manifest.getMainClass());
 
         // Auth placeholders
         AuthManager.AuthResult auth = null;
@@ -50,6 +46,22 @@ public class ArgumentBuilder {
         placeholders.put("assets_index_name", manifest.getAssetIndex());
         placeholders.put("version_type", "release");
         placeholders.put("auth_xuid", "");
+        placeholders.put("natives_directory", nativesDir.toAbsolutePath().normalize().toString());
+        placeholders.put("library_directory", TCLPaths.LIBRARIES_DIR.toAbsolutePath().normalize().toString());
+        placeholders.put("classpath_separator", File.pathSeparator);
+        placeholders.put("classpath", classpathStr);
+        placeholders.put("launcher_name", "TechCraftLauncher");
+        placeholders.put("launcher_version", "1.0");
+
+        for (String rawArg : manifest.getJvmArguments()) {
+            String arg = replacePlaceholders(rawArg, placeholders);
+            if (!arg.isEmpty()) argsList.add(arg);
+        }
+
+        argsList.add("-Djava.library.path=" + nativesDir.toAbsolutePath().normalize());
+        argsList.add("-cp");
+        argsList.add(classpathStr);
+        argsList.add(manifest.getMainClass());
 
         for (String rawArg : manifest.getGameArguments()) {
             String arg = replacePlaceholders(rawArg, placeholders);

@@ -253,6 +253,7 @@
 .auth-card,
 .launch-card,
 .settings-card,
+.download-card,
 .about-card,
 .status-panel {
     -fx-background-color: rgba(18, 28, 49, 0.94);
@@ -281,6 +282,13 @@
     -fx-effect: none;
 }
 
+.download-card {
+    -fx-padding: 22;
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-effect: none;
+}
+
 .about-card {
     -fx-padding: 16 18 16 18;
     -fx-background-radius: 14;
@@ -304,6 +312,35 @@
     -fx-background-radius: 13;
 }
 
+.source-card {
+    -fx-padding: 13;
+    -fx-background-color: rgba(94, 234, 212, 0.045);
+    -fx-border-color: rgba(94, 234, 212, 0.12);
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+}
+
+.source-name {
+    -fx-fill: #dce7f2;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+}
+
+.component-card {
+    -fx-padding: 16;
+    -fx-background-color: rgba(7, 13, 26, 0.50);
+    -fx-border-color: rgba(148, 163, 184, 0.11);
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+}
+
+.compatibility-text {
+    -fx-fill: #718096;
+    -fx-font-size: 10px;
+}
+
 .notice-label {
     -fx-padding: 11 13 11 13;
     -fx-background-color: rgba(56, 189, 248, 0.07);
@@ -325,7 +362,9 @@
 }
 
 .version-badge,
-.setting-tag {
+.setting-tag,
+.download-badge,
+.step-pill {
     -fx-padding: 6 10 6 10;
     -fx-background-color: rgba(94, 234, 212, 0.09);
     -fx-border-color: rgba(94, 234, 212, 0.18);
@@ -335,6 +374,16 @@
     -fx-text-fill: #5eead4;
     -fx-font-size: 9px;
     -fx-font-weight: 800;
+}
+
+.download-badge {
+    -fx-text-fill: #5eead4;
+}
+
+.step-pill {
+    -fx-text-fill: #7dd3fc;
+    -fx-background-color: rgba(56, 189, 248, 0.08);
+    -fx-border-color: rgba(56, 189, 248, 0.16);
 }
 
 .setting-tag {
@@ -416,6 +465,107 @@
     -fx-text-fill: #7dd3fc;
     -fx-font-size: 13px;
     -fx-font-weight: 800;
+}
+
+/* Download center */
+
+.download-tabs {
+    -fx-padding: 5;
+    -fx-background-color: rgba(9, 16, 31, 0.76);
+    -fx-border-color: rgba(148, 163, 184, 0.10);
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+}
+
+.download-tab {
+    -fx-padding: 9 17 9 17;
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+    -fx-text-fill: #718096;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+    -fx-cursor: hand;
+}
+
+.download-tab:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.035);
+    -fx-text-fill: #d7e0ec;
+}
+
+.download-tab:selected {
+    -fx-background-color: rgba(94, 234, 212, 0.11);
+    -fx-text-fill: #82f2e2;
+}
+
+.component-check {
+    -fx-text-fill: #e8eef7;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+}
+
+.check-box .box {
+    -fx-background-color: #0b1324;
+    -fx-background-radius: 5;
+    -fx-border-color: rgba(148, 163, 184, 0.24);
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+}
+
+.check-box:selected .box {
+    -fx-background-color: #2dd4bf;
+    -fx-border-color: #5eead4;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: #061b19;
+}
+
+.project-list {
+    -fx-background-color: #0b1324;
+    -fx-background-insets: 0;
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(148, 163, 184, 0.13);
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+    -fx-padding: 5;
+}
+
+.project-list .list-cell {
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+    -fx-background-radius: 9;
+    -fx-text-fill: #dbe4ef;
+}
+
+.project-list .list-cell:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.035);
+}
+
+.project-list .list-cell:selected {
+    -fx-background-color: rgba(94, 234, 212, 0.09);
+}
+
+.project-cell-content {
+    -fx-padding: 11 13 11 13;
+}
+
+.project-title {
+    -fx-text-fill: #e8eef7;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+}
+
+.project-description {
+    -fx-text-fill: #8492a7;
+    -fx-font-size: 10px;
+    -fx-max-width: 650;
+}
+
+.project-meta {
+    -fx-text-fill: #526078;
+    -fx-font-size: 9px;
+    -fx-font-weight: 600;
 }
 
 /* Buttons */

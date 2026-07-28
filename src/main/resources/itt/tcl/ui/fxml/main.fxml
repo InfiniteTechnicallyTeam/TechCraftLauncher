@@ -42,6 +42,9 @@
             </Text>
             <Button text="%nav.home" maxWidth="Infinity" alignment="CENTER_LEFT"
                     mnemonicParsing="false" styleClass="nav-button-active"/>
+            <Button fx:id="downloadsBtn" text="%nav.downloads" maxWidth="Infinity"
+                    alignment="CENTER_LEFT" mnemonicParsing="false"
+                    styleClass="nav-button"/>
             <Button fx:id="settingsBtn" text="%nav.settings" maxWidth="Infinity"
                     alignment="CENTER_LEFT" mnemonicParsing="false"
                     styleClass="nav-button"/>

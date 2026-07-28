@@ -28,6 +28,7 @@ public final class MainController {
     @FXML private ComboBox<String> versionCombo;
     @FXML private Text versionCountText;
     @FXML private Button launchBtn;
+    @FXML private Button downloadsBtn;
     @FXML private Button settingsBtn;
     @FXML private Button logoutBtn;
     @FXML private ProgressBar progressBar;
@@ -40,6 +41,7 @@ public final class MainController {
         scanVersions();
 
         launchBtn.setOnAction(e -> doLaunch());
+        downloadsBtn.setOnAction(e -> App.getSceneManager().showDownloads());
         settingsBtn.setOnAction(e -> App.getSceneManager().showSettings());
         logoutBtn.setOnAction(e -> doLogout());
 
@@ -178,6 +180,7 @@ public final class MainController {
         languageCombo.setDisable(launching);
         versionCombo.setDisable(launching);
         settingsBtn.setDisable(launching);
+        downloadsBtn.setDisable(launching);
         logoutBtn.setDisable(launching);
         progressBar.setManaged(launching);
         progressBar.setVisible(launching);

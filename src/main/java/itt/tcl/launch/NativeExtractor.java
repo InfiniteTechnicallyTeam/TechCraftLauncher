@@ -3,6 +3,7 @@ package itt.tcl.launch;
 import com.google.gson.*;
 import itt.tcl.config.TCLPaths;
 import itt.tcl.download.*;
+import itt.tcl.version.VersionManifest;
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
@@ -13,6 +14,10 @@ import java.util.Comparator;
 public class NativeExtractor {
 
     public static void extract(Path versionJson, Path nativesDir) throws IOException {
+        extract(new VersionManifest(versionJson), nativesDir);
+    }
+
+    public static void extract(VersionManifest manifest, Path nativesDir) throws IOException {
         if (Files.exists(nativesDir)) {
             try (Stream<Path> walk = Files.walk(nativesDir)) {
                 walk.sorted(Comparator.reverseOrder())
@@ -25,8 +30,8 @@ public class NativeExtractor {
         }
         Files.createDirectories(nativesDir);
 
-        try (Reader reader = Files.newBufferedReader(versionJson)) {
-            JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
+        {
+            JsonObject root = manifest.getRoot();
             JsonArray libraries = root.getAsJsonArray("libraries");
             String nativeKey = System.getProperty("os.name").toLowerCase().contains("win") ? "windows" : "linux";
             for (JsonElement elem : libraries) {
@@ -46,6 +51,12 @@ public class NativeExtractor {
                     }
                 }
                 if (classifier == null) continue;
+                classifier = classifier.replace(
+                        "${arch}",
+                        System.getProperty("os.arch", "").contains("64")
+                                ? "64"
+                                : "32"
+                );
 
                 if (lib.has("rules")) {
                     boolean allowed = false;

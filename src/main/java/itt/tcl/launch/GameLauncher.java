@@ -27,7 +27,7 @@ public class GameLauncher {
 
         // Extract natives
         Path nativesDir = TCLPaths.VERSIONS_DIR.resolve(versionId + "/natives");
-        NativeExtractor.extract(versionJson, nativesDir);
+        NativeExtractor.extract(manifest, nativesDir);
 
         System.out.println("Native libraries in " + nativesDir + ":");
         try (Stream<Path> list = Files.list(nativesDir)) {

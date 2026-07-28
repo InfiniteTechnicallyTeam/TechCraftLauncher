@@ -13,6 +13,7 @@ public class TCLPaths {
 
     public static final Path TCL_DIR = ROOT_DIR.resolve("TCL");
     public static final Path TEMP_DIR = TCL_DIR.resolve("temp");
+    public static final Path DOWNLOADS_DIR = TCL_DIR.resolve("downloads");
     public static final Path PLUGINS_DIR = TCL_DIR.resolve("plugins");
     public static final Path LAUNCHER_PROFILES = TCL_DIR.resolve("launcher_profiles.json");
     public static final Path VERSION_MANIFEST = TCL_DIR.resolve("version_manifest_v2.json");
@@ -22,6 +23,7 @@ public class TCLPaths {
         try {
             Files.createDirectories(TCL_DIR);
             Files.createDirectories(TEMP_DIR);
+            Files.createDirectories(DOWNLOADS_DIR);
             Files.createDirectories(PLUGINS_DIR);
             Files.createDirectories(VERSIONS_DIR);
             Files.createDirectories(LIBRARIES_DIR);
