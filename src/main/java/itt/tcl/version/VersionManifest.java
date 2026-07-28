@@ -326,10 +326,24 @@ public final class VersionManifest {
 
     private static String libraryKey(JsonObject library) {
         String coordinate = library.get("name").getAsString();
-        String[] parts = coordinate.split(":");
-        return parts.length >= 2
-                ? parts[0] + ":" + parts[1]
-                : coordinate;
+        String[] extensionParts = coordinate.split("@", 2);
+        String[] parts = extensionParts[0].split(":");
+        if (parts.length < 2) {
+            return coordinate;
+        }
+
+        // A modern version manifest can contain all of these at once:
+        //   org.lwjgl:lwjgl-glfw:3.4.1
+        //   org.lwjgl:lwjgl-glfw:3.4.1:natives-windows
+        //   org.lwjgl:lwjgl-glfw:3.4.1:natives-windows-arm64
+        // They are different artifacts and must not overwrite one another.
+        // The version is intentionally omitted so a child profile can still
+        // replace the parent's version of the same artifact/classifier.
+        String classifier = parts.length >= 4 ? parts[3] : "";
+        String extension = extensionParts.length == 2
+                ? extensionParts[1]
+                : "jar";
+        return parts[0] + ":" + parts[1] + ":" + classifier + "@" + extension;
     }
 
     private static String stripJsonExtension(String filename) {
