@@ -9,11 +9,16 @@ import itt.tcl.version.VersionInstaller;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -29,6 +34,11 @@ public final class DownloadCatalogService {
     public static final String NEOFORGE_MAVEN =
             "https://maven.neoforged.net/releases";
     public static final String MODRINTH_API = "https://api.modrinth.com/v2";
+    public static final String CURSEFORGE_API = "https://api.curseforge.com";
+
+    private static final int CURSEFORGE_MINECRAFT_GAME_ID = 432;
+    private static final int CURSEFORGE_MOD_CLASS_ID = 6;
+    private static final int CURSEFORGE_MODPACK_CLASS_ID = 4471;
 
     private static final String USER_AGENT =
             "InfiniteTechnicallyTeam/TechCraftLauncher/1.0 (github.com/InfiniteTechnicallyTeam/TechCraftLauncher)";
@@ -65,6 +75,7 @@ public final class DownloadCatalogService {
     }
 
     public record ProjectResult(
+            ProjectSource source,
             String id,
             String slug,
             String title,
@@ -157,6 +168,77 @@ public final class DownloadCatalogService {
     }
 
     public List<ProjectResult> searchProjects(
+            ProjectSource source,
+            String query,
+            String projectType,
+            String minecraftVersion,
+            LoaderType loader,
+            String curseForgeApiKey
+    ) throws Exception {
+        return switch (source) {
+            case MODRINTH -> searchModrinthProjects(
+                    query,
+                    projectType,
+                    minecraftVersion,
+                    loader
+            );
+            case CURSEFORGE -> searchCurseForgeProjects(
+                    query,
+                    projectType,
+                    minecraftVersion,
+                    loader,
+                    curseForgeApiKey
+            );
+        };
+    }
+
+    public ProjectFile findLatestProjectFile(
+            ProjectSource source,
+            String projectId,
+            String projectType,
+            String minecraftVersion,
+            LoaderType loader,
+            String curseForgeApiKey
+    ) throws Exception {
+        return switch (source) {
+            case MODRINTH -> findLatestModrinthFile(
+                    projectId,
+                    projectType,
+                    minecraftVersion,
+                    loader
+            );
+            case CURSEFORGE -> findLatestCurseForgeFile(
+                    projectId,
+                    projectType,
+                    minecraftVersion,
+                    loader,
+                    curseForgeApiKey
+            );
+        };
+    }
+
+    public void downloadProjectFile(
+            ProjectSource source,
+            ProjectFile file,
+            Path destination,
+            String curseForgeApiKey
+    ) throws Exception {
+        if (source == ProjectSource.MODRINTH) {
+            DownloadManager.downloadFileSilent(file.url(), destination);
+            return;
+        }
+        downloadCurseForgeFile(
+                file.url(),
+                destination,
+                resolveCurseForgeApiKey(curseForgeApiKey)
+        );
+    }
+
+    public boolean hasCurseForgeApiKey(String providedKey) {
+        return !configuredCurseForgeApiKey(providedKey).isBlank();
+    }
+
+    private List<ProjectResult> searchModrinthProjects(
             String query,
             String projectType,
             String minecraftVersion,
@@ -179,6 +261,7 @@ public final class DownloadCatalogService {
         for (JsonElement element : response.getAsJsonArray("hits")) {
             JsonObject item = element.getAsJsonObject();
             results.add(new ProjectResult(
+                    ProjectSource.MODRINTH,
                     text(item, "project_id"),
                     text(item, "slug"),
                     text(item, "title"),
@@ -191,7 +274,7 @@ public final class DownloadCatalogService {
         return results;
     }
 
-    public ProjectFile findLatestProjectFile(
+    private ProjectFile findLatestModrinthFile(
             String projectId,
             String projectType,
             String minecraftVersion,
@@ -229,6 +312,157 @@ public final class DownloadCatalogService {
             }
         }
         throw new IllegalStateException("No compatible downloadable file was found");
+    }
+
+    private List<ProjectResult> searchCurseForgeProjects(
+            String query,
+            String projectType,
+            String minecraftVersion,
+            LoaderType loader,
+            String providedApiKey
+    ) throws Exception {
+        String apiKey = resolveCurseForgeApiKey(providedApiKey);
+        int classId = "modpack".equals(projectType)
+                ? CURSEFORGE_MODPACK_CLASS_ID
+                : CURSEFORGE_MOD_CLASS_ID;
+        StringBuilder url = new StringBuilder(CURSEFORGE_API)
+                .append("/v1/mods/search?gameId=")
+                .append(CURSEFORGE_MINECRAFT_GAME_ID)
+                .append("&classId=")
+                .append(classId)
+                .append("&sortField=2&sortOrder=desc&pageSize=30");
+        appendQuery(url, "gameVersion", minecraftVersion);
+        if (query != null && !query.isBlank()) {
+            appendQuery(url, "searchFilter", query.trim());
+        }
+        int loaderId = curseForgeLoaderId(loader);
+        if (loaderId != 0) {
+            appendQuery(url, "modLoaderType", Integer.toString(loaderId));
+        }
+
+        JsonObject response = getCurseForgeJson(url.toString(), apiKey)
+                .getAsJsonObject();
+        JsonArray data = response.has("data") && response.get("data").isJsonArray()
+                ? response.getAsJsonArray("data")
+                : new JsonArray();
+        List<ProjectResult> results = new ArrayList<>();
+        for (JsonElement element : data) {
+            JsonObject item = element.getAsJsonObject();
+            if (item.has("isAvailable") && !booleanValue(item, "isAvailable")) {
+                continue;
+            }
+            results.add(new ProjectResult(
+                    ProjectSource.CURSEFORGE,
+                    Long.toString(longValue(item, "id")),
+                    text(item, "slug"),
+                    text(item, "name"),
+                    text(item, "summary"),
+                    curseForgeAuthors(item),
+                    longValue(item, "downloadCount"),
+                    projectType
+            ));
+        }
+        return results;
+    }
+
+    private ProjectFile findLatestCurseForgeFile(
+            String projectId,
+            String projectType,
+            String minecraftVersion,
+            LoaderType loader,
+            String providedApiKey
+    ) throws Exception {
+        String apiKey = resolveCurseForgeApiKey(providedApiKey);
+        StringBuilder url = new StringBuilder(CURSEFORGE_API)
+                .append("/v1/mods/")
+                .append(encodePath(projectId))
+                .append("/files?pageSize=50");
+        appendQuery(url, "gameVersion", minecraftVersion);
+        int loaderId = curseForgeLoaderId(loader);
+        if (loaderId != 0) {
+            appendQuery(url, "modLoaderType", Integer.toString(loaderId));
+        }
+
+        JsonObject response = getCurseForgeJson(url.toString(), apiKey)
+                .getAsJsonObject();
+        JsonArray files = response.has("data") && response.get("data").isJsonArray()
+                ? response.getAsJsonArray("data")
+                : new JsonArray();
+        String wantedExtension = "modpack".equals(projectType) ? ".zip" : ".jar";
+
+        for (JsonElement element : files) {
+            JsonObject file = element.getAsJsonObject();
+            if (file.has("isAvailable") && !booleanValue(file, "isAvailable")) {
+                continue;
+            }
+            String filename = safeFilename(text(file, "fileName"));
+            if (!filename.toLowerCase(Locale.ROOT).endsWith(wantedExtension)) {
+                continue;
+            }
+            String downloadUrl = text(file, "downloadUrl");
+            if (downloadUrl.isBlank()) {
+                long fileId = longValue(file, "id");
+                if (fileId == 0L) {
+                    continue;
+                }
+                try {
+                    JsonObject downloadResponse = getCurseForgeJson(
+                            CURSEFORGE_API + "/v1/mods/" + encodePath(projectId)
+                                    + "/files/" + fileId + "/download-url",
+                            apiKey
+                    ).getAsJsonObject();
+                    JsonElement data = downloadResponse.get("data");
+                    downloadUrl = data == null || data.isJsonNull()
+                            ? ""
+                            : data.getAsString();
+                } catch (Exception unavailable) {
+                    continue;
+                }
+            }
+            if (!downloadUrl.isBlank()) {
+                String displayName = text(file, "displayName");
+                return new ProjectFile(
+                        filename,
+                        downloadUrl,
+                        displayName.isBlank() ? filename : displayName
+                );
+            }
+        }
+        throw new IllegalStateException(
+                "CurseForge did not return a compatible downloadable file"
+        );
+    }
+
+    private void downloadCurseForgeFile(
+            String url,
+            Path destination,
+            String apiKey
+    ) throws Exception {
+        Files.createDirectories(destination.getParent());
+        HttpRequest request = HttpRequest.newBuilder(URI.create(url))
+                .timeout(Duration.ofMinutes(5))
+                .header("Accept", "application/octet-stream, */*")
+                .header("User-Agent", USER_AGENT)
+                .header("x-api-key", apiKey)
+                .GET()
+                .build();
+        HttpResponse<InputStream> response = HttpHelper.getClient().send(
+                request,
+                HttpResponse.BodyHandlers.ofInputStream()
+        );
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            response.body().close();
+            Files.deleteIfExists(destination);
+            throw new IOException(
+                    "CurseForge download failed (" + response.statusCode() + ")"
+            );
+        }
+        try (InputStream input = response.body()) {
+            Files.copy(input, destination, StandardCopyOption.REPLACE_EXISTING);
+        } catch (Exception error) {
+            Files.deleteIfExists(destination);
+            throw error;
+        }
     }
 
     public String optiFineDownloadUrl(OptiFineVersion version) {
@@ -351,6 +585,28 @@ public final class DownloadCatalogService {
         return JsonParser.parseString(getText(url));
     }
 
+    private JsonElement getCurseForgeJson(String url, String apiKey)
+            throws Exception {
+        HttpRequest request = HttpRequest.newBuilder(URI.create(url))
+                .timeout(Duration.ofSeconds(30))
+                .header("Accept", "application/json")
+                .header("User-Agent", USER_AGENT)
+                .header("x-api-key", apiKey)
+                .GET()
+                .build();
+        HttpResponse<String> response = HttpHelper.getClient().send(
+                request,
+                HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8)
+        );
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new IllegalStateException(
+                    "CurseForge request failed (" + response.statusCode()
+                            + "). Check the API Key and try again."
+            );
+        }
+        return JsonParser.parseString(response.body());
+    }
+
     private String getText(String url) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(URI.create(url))
                 .timeout(Duration.ofSeconds(30))
@@ -368,6 +624,81 @@ public final class DownloadCatalogService {
             );
         }
         return response.body();
+    }
+
+    private static String configuredCurseForgeApiKey(String providedKey) {
+        if (providedKey != null && !providedKey.isBlank()) {
+            return providedKey.trim();
+        }
+        String property = System.getProperty("tcl.curseforge.apiKey", "").trim();
+        if (!property.isBlank()) {
+            return property;
+        }
+        String environment = System.getenv("CURSEFORGE_API_KEY");
+        return environment == null ? "" : environment.trim();
+    }
+
+    private static String resolveCurseForgeApiKey(String providedKey) {
+        String apiKey = configuredCurseForgeApiKey(providedKey);
+        if (apiKey.isBlank()) {
+            throw new IllegalStateException(
+                    "CurseForge API Key is required. Enter it in the download page "
+                            + "or set -Dtcl.curseforge.apiKey / CURSEFORGE_API_KEY."
+            );
+        }
+        return apiKey;
+    }
+
+    private static int curseForgeLoaderId(LoaderType loader) {
+        if (loader == null || loader == LoaderType.VANILLA) {
+            return 0;
+        }
+        return switch (loader) {
+            case FORGE -> 1;
+            case FABRIC -> 4;
+            case QUILT -> 5;
+            case NEOFORGE -> 6;
+            case VANILLA -> 0;
+        };
+    }
+
+    private static String curseForgeAuthors(JsonObject project) {
+        if (!project.has("authors") || !project.get("authors").isJsonArray()) {
+            return "";
+        }
+        List<String> authors = new ArrayList<>();
+        for (JsonElement element : project.getAsJsonArray("authors")) {
+            if (!element.isJsonObject()) {
+                continue;
+            }
+            String name = text(element.getAsJsonObject(), "name");
+            if (!name.isBlank()) {
+                authors.add(name);
+            }
+        }
+        return String.join(", ", authors);
+    }
+
+    private static void appendQuery(
+            StringBuilder url,
+            String name,
+            String value
+    ) {
+        if (value == null || value.isBlank()) {
+            return;
+        }
+        url.append('&')
+                .append(encodeQuery(name))
+                .append('=')
+                .append(encodeQuery(value));
+    }
+
+    private static String safeFilename(String filename) {
+        String normalized = filename == null
+                ? ""
+                : filename.replace('\\', '/');
+        int separator = normalized.lastIndexOf('/');
+        return separator >= 0 ? normalized.substring(separator + 1) : normalized;
     }
 
     private static JsonObject selectFile(

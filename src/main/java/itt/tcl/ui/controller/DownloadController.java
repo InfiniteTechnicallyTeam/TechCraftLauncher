@@ -9,9 +9,9 @@ import itt.tcl.download.DownloadCatalogService.LoaderVersion;
 import itt.tcl.download.DownloadCatalogService.OptiFineVersion;
 import itt.tcl.download.DownloadCatalogService.ProjectFile;
 import itt.tcl.download.DownloadCatalogService.ProjectResult;
-import itt.tcl.download.DownloadManager;
 import itt.tcl.download.LoaderInstallService;
 import itt.tcl.download.LoaderType;
+import itt.tcl.download.ProjectSource;
 import itt.tcl.ui.App;
 import itt.tcl.ui.LanguageManager;
 import javafx.concurrent.Task;
@@ -23,9 +23,11 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
@@ -58,16 +60,22 @@ public final class DownloadController {
     @FXML private Button installBtn;
 
     @FXML private TextField modQueryField;
+    @FXML private ComboBox<ProjectSource> modSourceCombo;
     @FXML private ComboBox<GameVersion> modGameVersionCombo;
     @FXML private ComboBox<LoaderType> modLoaderCombo;
+    @FXML private HBox modCurseForgeKeyRow;
+    @FXML private PasswordField modCurseForgeKeyField;
     @FXML private Button modSearchBtn;
     @FXML private ListView<ProjectResult> modResultsList;
     @FXML private ComboBox<String> modTargetCombo;
     @FXML private Button modDownloadBtn;
 
     @FXML private TextField packQueryField;
+    @FXML private ComboBox<ProjectSource> packSourceCombo;
     @FXML private ComboBox<GameVersion> packGameVersionCombo;
     @FXML private ComboBox<LoaderType> packLoaderCombo;
+    @FXML private HBox packCurseForgeKeyRow;
+    @FXML private PasswordField packCurseForgeKeyField;
     @FXML private Button packSearchBtn;
     @FXML private ListView<ProjectResult> packResultsList;
     @FXML private Button packDownloadBtn;
@@ -148,6 +156,27 @@ public final class DownloadController {
                 LoaderType.FABRIC,
                 LoaderType.QUILT
         );
+        modSourceCombo.getItems().setAll(ProjectSource.values());
+        packSourceCombo.getItems().setAll(ProjectSource.values());
+        modSourceCombo.getSelectionModel().select(ProjectSource.MODRINTH);
+        packSourceCombo.getSelectionModel().select(ProjectSource.MODRINTH);
+        modCurseForgeKeyField.textProperty().bindBidirectional(
+                packCurseForgeKeyField.textProperty()
+        );
+        modSourceCombo.valueProperty().addListener(
+                (observable, oldValue, newValue) -> updateProjectSource(
+                        newValue,
+                        modCurseForgeKeyRow,
+                        modResultsList
+                )
+        );
+        packSourceCombo.valueProperty().addListener(
+                (observable, oldValue, newValue) -> updateProjectSource(
+                        newValue,
+                        packCurseForgeKeyRow,
+                        packResultsList
+                )
+        );
         modLoaderCombo.getItems().setAll(modLoaders);
         modLoaderCombo.getSelectionModel().select(LoaderType.FORGE);
         modGameVersionCombo.valueProperty().addListener(
@@ -179,6 +208,39 @@ public final class DownloadController {
         );
         modDownloadBtn.setDisable(true);
         packDownloadBtn.setDisable(true);
+        updateProjectSource(
+                modSourceCombo.getValue(),
+                modCurseForgeKeyRow,
+                modResultsList
+        );
+        updateProjectSource(
+                packSourceCombo.getValue(),
+                packCurseForgeKeyRow,
+                packResultsList
+        );
+    }
+
+    private void updateProjectSource(
+            ProjectSource source,
+            HBox apiKeyRow,
+            ListView<ProjectResult> results
+    ) {
+        boolean curseForge = source == ProjectSource.CURSEFORGE;
+        apiKeyRow.setManaged(curseForge);
+        apiKeyRow.setVisible(curseForge);
+        results.getItems().clear();
+        if (curseForge) {
+            showStatus(
+                    LanguageManager.text(
+                            catalog.hasCurseForgeApiKey(curseForgeApiKey())
+                                    ? "download.status.curseForgeReady"
+                                    : "download.status.curseForgeKeyRequired"
+                    ),
+                    catalog.hasCurseForgeApiKey(curseForgeApiKey())
+                            ? "status-muted"
+                            : "status-warning"
+            );
+        }
     }
 
     private void showTab(VBox selectedPane, ToggleButton selectedButton) {
@@ -420,6 +482,7 @@ public final class DownloadController {
 
     private void searchMods() {
         searchProjects(
+                modSourceCombo.getValue(),
                 modQueryField.getText(),
                 "mod",
                 modGameVersionCombo.getValue(),
@@ -431,6 +494,7 @@ public final class DownloadController {
 
     private void searchPacks() {
         searchProjects(
+                packSourceCombo.getValue(),
                 packQueryField.getText(),
                 "modpack",
                 packGameVersionCombo.getValue(),
@@ -441,6 +505,7 @@ public final class DownloadController {
     }
 
     private void searchProjects(
+            ProjectSource source,
             String query,
             String projectType,
             GameVersion game,
@@ -452,16 +517,34 @@ public final class DownloadController {
             showStatus(LanguageManager.text("download.status.chooseGameVersion"), "status-warning");
             return;
         }
+        if (source == null) {
+            showStatus(LanguageManager.text("download.status.chooseSource"), "status-warning");
+            return;
+        }
+        if (source == ProjectSource.CURSEFORGE
+                && !catalog.hasCurseForgeApiKey(curseForgeApiKey())) {
+            showStatus(
+                    LanguageManager.text("download.status.curseForgeKeyRequired"),
+                    "status-warning"
+            );
+            return;
+        }
+        String apiKey = curseForgeApiKey();
         setBusy(true);
-        showStatus(LanguageManager.text("download.status.searching"), "status-active");
+        showStatus(LanguageManager.text(
+                "download.status.searchingSource",
+                source.displayName()
+        ), "status-active");
         Task<List<ProjectResult>> task = new Task<>() {
             @Override
             protected List<ProjectResult> call() throws Exception {
                 return catalog.searchProjects(
+                        source,
                         query,
                         projectType,
                         game.id(),
-                        loader
+                        loader,
+                        apiKey
                 );
             }
         };
@@ -472,7 +555,8 @@ public final class DownloadController {
                 results.getSelectionModel().selectFirst();
             }
             showStatus(LanguageManager.text(
-                    "download.status.results",
+                    "download.status.sourceResults",
+                    source.displayName(),
                     task.getValue().size()
             ), "status-success");
         });
@@ -535,6 +619,15 @@ public final class DownloadController {
             Path destinationDirectory,
             String threadName
     ) {
+        if (project.source() == ProjectSource.CURSEFORGE
+                && !catalog.hasCurseForgeApiKey(curseForgeApiKey())) {
+            showStatus(
+                    LanguageManager.text("download.status.curseForgeKeyRequired"),
+                    "status-warning"
+            );
+            return;
+        }
+        String apiKey = curseForgeApiKey();
         setBusy(true);
         showStatus(LanguageManager.text(
                 "download.status.resolvingFile",
@@ -544,10 +637,12 @@ public final class DownloadController {
             @Override
             protected Path call() throws Exception {
                 ProjectFile file = catalog.findLatestProjectFile(
+                        project.source(),
                         project.id(),
                         projectType,
                         game.id(),
-                        loader
+                        loader,
+                        apiKey
                 );
                 updateMessage(LanguageManager.text(
                         "download.status.downloadingProject",
@@ -555,7 +650,12 @@ public final class DownloadController {
                 ));
                 Files.createDirectories(destinationDirectory);
                 Path destination = destinationDirectory.resolve(file.filename());
-                DownloadManager.downloadFileSilent(file.url(), destination);
+                catalog.downloadProjectFile(
+                        project.source(),
+                        file,
+                        destination,
+                        apiKey
+                );
                 return destination;
             }
         };
@@ -656,6 +756,10 @@ public final class DownloadController {
         installBtn.setDisable(value);
         modSearchBtn.setDisable(value);
         packSearchBtn.setDisable(value);
+        modSourceCombo.setDisable(value);
+        packSourceCombo.setDisable(value);
+        modCurseForgeKeyField.setDisable(value);
+        packCurseForgeKeyField.setDisable(value);
         modDownloadBtn.setDisable(
                 value || modResultsList.getSelectionModel().getSelectedItem() == null
                         || modTargetCombo.getValue() == null
@@ -666,6 +770,11 @@ public final class DownloadController {
         if (!value) {
             updateInstallButton();
         }
+    }
+
+    private String curseForgeApiKey() {
+        String apiKey = modCurseForgeKeyField.getText();
+        return apiKey == null ? "" : apiKey.trim();
     }
 
     private void showStatus(String message, String styleClass) {
@@ -732,6 +841,7 @@ public final class DownloadController {
             description.setText(project.description());
             metadata.setText(LanguageManager.text(
                     "download.project.meta",
+                    project.source().displayName(),
                     project.author(),
                     String.format(Locale.ROOT, "%,d", project.downloads())
             ));

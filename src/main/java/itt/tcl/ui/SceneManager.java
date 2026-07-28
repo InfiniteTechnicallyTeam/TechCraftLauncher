@@ -39,6 +39,9 @@ public final class SceneManager {
 
     private void show(View view) {
         try {
+            boolean preservePosition = stage.isShowing();
+            double previousX = stage.getX();
+            double previousY = stage.getY();
             URL fxml = requireResource(view.fxmlPath());
             URL stylesheet = requireResource(STYLESHEET);
 
@@ -67,8 +70,9 @@ public final class SceneManager {
             scene.getStylesheets().setAll(stylesheet.toExternalForm());
             stage.setTitle(title);
 
-            if (stage.isShowing()) {
-                stage.centerOnScreen();
+            if (preservePosition && !stage.isMaximized()) {
+                stage.setX(previousX);
+                stage.setY(previousY);
             }
             playEntrance(root);
         } catch (IOException e) {

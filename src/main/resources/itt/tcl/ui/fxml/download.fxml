@@ -6,6 +6,7 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
@@ -156,6 +157,8 @@
                                    promptText="%download.search.prompt"
                                    prefHeight="41" HBox.hgrow="ALWAYS"
                                    styleClass="input-field"/>
+                        <ComboBox fx:id="modSourceCombo" prefWidth="122"
+                                  promptText="%download.source.select" prefHeight="41"/>
                         <ComboBox fx:id="modGameVersionCombo" prefWidth="138"
                                   promptText="%download.game.version" prefHeight="41"/>
                         <ComboBox fx:id="modLoaderCombo" prefWidth="126"
@@ -163,6 +166,19 @@
                         <Button fx:id="modSearchBtn" text="%download.search"
                                 prefHeight="41" mnemonicParsing="false"
                                 styleClass="secondary-button"/>
+                    </HBox>
+
+                    <HBox fx:id="modCurseForgeKeyRow" alignment="CENTER_LEFT"
+                          spacing="10" visible="false" managed="false"
+                          styleClass="api-key-row">
+                        <Text text="%download.curseforge.apiKey"
+                              styleClass="field-label"/>
+                        <PasswordField fx:id="modCurseForgeKeyField"
+                                       promptText="%download.curseforge.apiKeyPrompt"
+                                       prefWidth="250" prefHeight="38"
+                                       styleClass="input-field"/>
+                        <Text text="%download.curseforge.apiKeyHelp"
+                              wrappingWidth="330" styleClass="helper-text"/>
                     </HBox>
 
                     <ListView fx:id="modResultsList" VBox.vgrow="ALWAYS"
@@ -192,6 +208,8 @@
                                    promptText="%download.search.packPrompt"
                                    prefHeight="41" HBox.hgrow="ALWAYS"
                                    styleClass="input-field"/>
+                        <ComboBox fx:id="packSourceCombo" prefWidth="122"
+                                  promptText="%download.source.select" prefHeight="41"/>
                         <ComboBox fx:id="packGameVersionCombo" prefWidth="138"
                                   promptText="%download.game.version" prefHeight="41"/>
                         <ComboBox fx:id="packLoaderCombo" prefWidth="138"
@@ -199,6 +217,19 @@
                         <Button fx:id="packSearchBtn" text="%download.search"
                                 prefHeight="41" mnemonicParsing="false"
                                 styleClass="secondary-button"/>
+                    </HBox>
+
+                    <HBox fx:id="packCurseForgeKeyRow" alignment="CENTER_LEFT"
+                          spacing="10" visible="false" managed="false"
+                          styleClass="api-key-row">
+                        <Text text="%download.curseforge.apiKey"
+                              styleClass="field-label"/>
+                        <PasswordField fx:id="packCurseForgeKeyField"
+                                       promptText="%download.curseforge.apiKeyPrompt"
+                                       prefWidth="250" prefHeight="38"
+                                       styleClass="input-field"/>
+                        <Text text="%download.curseforge.apiKeyHelp"
+                              wrappingWidth="330" styleClass="helper-text"/>
                     </HBox>
 
                     <ListView fx:id="packResultsList" VBox.vgrow="ALWAYS"
