@@ -31,6 +31,10 @@ dependencies {
     implementation("org.openjfx:javafx-controls:$javafxVersion:win")
     implementation("org.openjfx:javafx-fxml:$javafxVersion:win")
     implementation("org.openjfx:javafx-graphics:$javafxVersion:win")
+
+    // Networking + IO improvements for downloader
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+    implementation("com.squareup.okio:okio:3.4.0")
 }
 
 tasks.withType<JavaCompile> {
