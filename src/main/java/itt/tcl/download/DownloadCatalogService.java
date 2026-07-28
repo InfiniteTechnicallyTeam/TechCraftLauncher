@@ -172,8 +172,7 @@ public final class DownloadCatalogService {
             String query,
             String projectType,
             String minecraftVersion,
-            LoaderType loader,
-            String curseForgeApiKey
+            LoaderType loader
     ) throws Exception {
         return switch (source) {
             case MODRINTH -> searchModrinthProjects(
@@ -186,8 +185,7 @@ public final class DownloadCatalogService {
                     query,
                     projectType,
                     minecraftVersion,
-                    loader,
-                    curseForgeApiKey
+                    loader
             );
         };
     }
@@ -197,8 +195,7 @@ public final class DownloadCatalogService {
             String projectId,
             String projectType,
             String minecraftVersion,
-            LoaderType loader,
-            String curseForgeApiKey
+            LoaderType loader
     ) throws Exception {
         return switch (source) {
             case MODRINTH -> findLatestModrinthFile(
@@ -211,8 +208,7 @@ public final class DownloadCatalogService {
                     projectId,
                     projectType,
                     minecraftVersion,
-                    loader,
-                    curseForgeApiKey
+                    loader
             );
         };
     }
@@ -220,8 +216,7 @@ public final class DownloadCatalogService {
     public void downloadProjectFile(
             ProjectSource source,
             ProjectFile file,
-            Path destination,
-            String curseForgeApiKey
+            Path destination
     ) throws Exception {
         if (source == ProjectSource.MODRINTH) {
             DownloadManager.downloadFileSilent(file.url(), destination);
@@ -230,12 +225,12 @@ public final class DownloadCatalogService {
         downloadCurseForgeFile(
                 file.url(),
                 destination,
-                resolveCurseForgeApiKey(curseForgeApiKey)
+                resolveCurseForgeApiKey()
         );
     }
 
-    public boolean hasCurseForgeApiKey(String providedKey) {
-        return !configuredCurseForgeApiKey(providedKey).isBlank();
+    public boolean hasCurseForgeApiKey() {
+        return !configuredCurseForgeApiKey().isBlank();
     }
 
     private List<ProjectResult> searchModrinthProjects(
@@ -318,10 +313,9 @@ public final class DownloadCatalogService {
             String query,
             String projectType,
             String minecraftVersion,
-            LoaderType loader,
-            String providedApiKey
+            LoaderType loader
     ) throws Exception {
-        String apiKey = resolveCurseForgeApiKey(providedApiKey);
+        String apiKey = resolveCurseForgeApiKey();
         int classId = "modpack".equals(projectType)
                 ? CURSEFORGE_MODPACK_CLASS_ID
                 : CURSEFORGE_MOD_CLASS_ID;
@@ -369,10 +363,9 @@ public final class DownloadCatalogService {
             String projectId,
             String projectType,
             String minecraftVersion,
-            LoaderType loader,
-            String providedApiKey
+            LoaderType loader
     ) throws Exception {
-        String apiKey = resolveCurseForgeApiKey(providedApiKey);
+        String apiKey = resolveCurseForgeApiKey();
         StringBuilder url = new StringBuilder(CURSEFORGE_API)
                 .append("/v1/mods/")
                 .append(encodePath(projectId))
@@ -626,24 +619,28 @@ public final class DownloadCatalogService {
         return response.body();
     }
 
-    private static String configuredCurseForgeApiKey(String providedKey) {
-        if (providedKey != null && !providedKey.isBlank()) {
-            return providedKey.trim();
+    private static String configuredCurseForgeApiKey() {
+        String sourceKey = CurseForgeConfig.apiKey().trim();
+        if (!sourceKey.isBlank()) {
+            return sourceKey;
         }
         String property = System.getProperty("tcl.curseforge.apiKey", "").trim();
         if (!property.isBlank()) {
             return property;
         }
         String environment = System.getenv("CURSEFORGE_API_KEY");
-        return environment == null ? "" : environment.trim();
+        if (environment != null && !environment.isBlank()) {
+            return environment.trim();
+        }
+        return "";
     }
 
-    private static String resolveCurseForgeApiKey(String providedKey) {
-        String apiKey = configuredCurseForgeApiKey(providedKey);
+    private static String resolveCurseForgeApiKey() {
+        String apiKey = configuredCurseForgeApiKey();
         if (apiKey.isBlank()) {
             throw new IllegalStateException(
-                    "CurseForge API Key is required. Enter it in the download page "
-                            + "or set -Dtcl.curseforge.apiKey / CURSEFORGE_API_KEY."
+                    "This launcher build does not contain a CurseForge API Key. "
+                            + "Set CurseForgeConfig.API_KEY and rebuild it."
             );
         }
         return apiKey;

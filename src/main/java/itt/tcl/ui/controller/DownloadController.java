@@ -23,11 +23,9 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
@@ -63,8 +61,6 @@ public final class DownloadController {
     @FXML private ComboBox<ProjectSource> modSourceCombo;
     @FXML private ComboBox<GameVersion> modGameVersionCombo;
     @FXML private ComboBox<LoaderType> modLoaderCombo;
-    @FXML private HBox modCurseForgeKeyRow;
-    @FXML private PasswordField modCurseForgeKeyField;
     @FXML private Button modSearchBtn;
     @FXML private ListView<ProjectResult> modResultsList;
     @FXML private ComboBox<String> modTargetCombo;
@@ -74,8 +70,6 @@ public final class DownloadController {
     @FXML private ComboBox<ProjectSource> packSourceCombo;
     @FXML private ComboBox<GameVersion> packGameVersionCombo;
     @FXML private ComboBox<LoaderType> packLoaderCombo;
-    @FXML private HBox packCurseForgeKeyRow;
-    @FXML private PasswordField packCurseForgeKeyField;
     @FXML private Button packSearchBtn;
     @FXML private ListView<ProjectResult> packResultsList;
     @FXML private Button packDownloadBtn;
@@ -160,20 +154,15 @@ public final class DownloadController {
         packSourceCombo.getItems().setAll(ProjectSource.values());
         modSourceCombo.getSelectionModel().select(ProjectSource.MODRINTH);
         packSourceCombo.getSelectionModel().select(ProjectSource.MODRINTH);
-        modCurseForgeKeyField.textProperty().bindBidirectional(
-                packCurseForgeKeyField.textProperty()
-        );
         modSourceCombo.valueProperty().addListener(
                 (observable, oldValue, newValue) -> updateProjectSource(
                         newValue,
-                        modCurseForgeKeyRow,
                         modResultsList
                 )
         );
         packSourceCombo.valueProperty().addListener(
                 (observable, oldValue, newValue) -> updateProjectSource(
                         newValue,
-                        packCurseForgeKeyRow,
                         packResultsList
                 )
         );
@@ -210,33 +199,28 @@ public final class DownloadController {
         packDownloadBtn.setDisable(true);
         updateProjectSource(
                 modSourceCombo.getValue(),
-                modCurseForgeKeyRow,
                 modResultsList
         );
         updateProjectSource(
                 packSourceCombo.getValue(),
-                packCurseForgeKeyRow,
                 packResultsList
         );
     }
 
     private void updateProjectSource(
             ProjectSource source,
-            HBox apiKeyRow,
             ListView<ProjectResult> results
     ) {
         boolean curseForge = source == ProjectSource.CURSEFORGE;
-        apiKeyRow.setManaged(curseForge);
-        apiKeyRow.setVisible(curseForge);
         results.getItems().clear();
         if (curseForge) {
             showStatus(
                     LanguageManager.text(
-                            catalog.hasCurseForgeApiKey(curseForgeApiKey())
+                            catalog.hasCurseForgeApiKey()
                                     ? "download.status.curseForgeReady"
                                     : "download.status.curseForgeKeyRequired"
                     ),
-                    catalog.hasCurseForgeApiKey(curseForgeApiKey())
+                    catalog.hasCurseForgeApiKey()
                             ? "status-muted"
                             : "status-warning"
             );
@@ -522,14 +506,13 @@ public final class DownloadController {
             return;
         }
         if (source == ProjectSource.CURSEFORGE
-                && !catalog.hasCurseForgeApiKey(curseForgeApiKey())) {
+                && !catalog.hasCurseForgeApiKey()) {
             showStatus(
                     LanguageManager.text("download.status.curseForgeKeyRequired"),
                     "status-warning"
             );
             return;
         }
-        String apiKey = curseForgeApiKey();
         setBusy(true);
         showStatus(LanguageManager.text(
                 "download.status.searchingSource",
@@ -543,8 +526,7 @@ public final class DownloadController {
                         query,
                         projectType,
                         game.id(),
-                        loader,
-                        apiKey
+                        loader
                 );
             }
         };
@@ -620,14 +602,13 @@ public final class DownloadController {
             String threadName
     ) {
         if (project.source() == ProjectSource.CURSEFORGE
-                && !catalog.hasCurseForgeApiKey(curseForgeApiKey())) {
+                && !catalog.hasCurseForgeApiKey()) {
             showStatus(
                     LanguageManager.text("download.status.curseForgeKeyRequired"),
                     "status-warning"
             );
             return;
         }
-        String apiKey = curseForgeApiKey();
         setBusy(true);
         showStatus(LanguageManager.text(
                 "download.status.resolvingFile",
@@ -641,8 +622,7 @@ public final class DownloadController {
                         project.id(),
                         projectType,
                         game.id(),
-                        loader,
-                        apiKey
+                        loader
                 );
                 updateMessage(LanguageManager.text(
                         "download.status.downloadingProject",
@@ -653,8 +633,7 @@ public final class DownloadController {
                 catalog.downloadProjectFile(
                         project.source(),
                         file,
-                        destination,
-                        apiKey
+                        destination
                 );
                 return destination;
             }
@@ -758,8 +737,6 @@ public final class DownloadController {
         packSearchBtn.setDisable(value);
         modSourceCombo.setDisable(value);
         packSourceCombo.setDisable(value);
-        modCurseForgeKeyField.setDisable(value);
-        packCurseForgeKeyField.setDisable(value);
         modDownloadBtn.setDisable(
                 value || modResultsList.getSelectionModel().getSelectedItem() == null
                         || modTargetCombo.getValue() == null
@@ -770,11 +747,6 @@ public final class DownloadController {
         if (!value) {
             updateInstallButton();
         }
-    }
-
-    private String curseForgeApiKey() {
-        String apiKey = modCurseForgeKeyField.getText();
-        return apiKey == null ? "" : apiKey.trim();
     }
 
     private void showStatus(String message, String styleClass) {

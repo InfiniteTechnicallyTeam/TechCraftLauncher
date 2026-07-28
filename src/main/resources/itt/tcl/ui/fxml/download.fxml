@@ -6,7 +6,6 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
@@ -168,19 +167,6 @@
                                 styleClass="secondary-button"/>
                     </HBox>
 
-                    <HBox fx:id="modCurseForgeKeyRow" alignment="CENTER_LEFT"
-                          spacing="10" visible="false" managed="false"
-                          styleClass="api-key-row">
-                        <Text text="%download.curseforge.apiKey"
-                              styleClass="field-label"/>
-                        <PasswordField fx:id="modCurseForgeKeyField"
-                                       promptText="%download.curseforge.apiKeyPrompt"
-                                       prefWidth="250" prefHeight="38"
-                                       styleClass="input-field"/>
-                        <Text text="%download.curseforge.apiKeyHelp"
-                              wrappingWidth="330" styleClass="helper-text"/>
-                    </HBox>
-
                     <ListView fx:id="modResultsList" VBox.vgrow="ALWAYS"
                               styleClass="project-list"/>
 
@@ -217,19 +203,6 @@
                         <Button fx:id="packSearchBtn" text="%download.search"
                                 prefHeight="41" mnemonicParsing="false"
                                 styleClass="secondary-button"/>
-                    </HBox>
-
-                    <HBox fx:id="packCurseForgeKeyRow" alignment="CENTER_LEFT"
-                          spacing="10" visible="false" managed="false"
-                          styleClass="api-key-row">
-                        <Text text="%download.curseforge.apiKey"
-                              styleClass="field-label"/>
-                        <PasswordField fx:id="packCurseForgeKeyField"
-                                       promptText="%download.curseforge.apiKeyPrompt"
-                                       prefWidth="250" prefHeight="38"
-                                       styleClass="input-field"/>
-                        <Text text="%download.curseforge.apiKeyHelp"
-                              wrappingWidth="330" styleClass="helper-text"/>
                     </HBox>
 
                     <ListView fx:id="packResultsList" VBox.vgrow="ALWAYS"
