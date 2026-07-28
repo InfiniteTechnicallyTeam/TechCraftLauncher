@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane prefWidth="1080" prefHeight="720" minWidth="900" minHeight="620"
+            styleClass="app-root"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="itt.tcl.ui.controller.DownloadController">
+
+    <left>
+        <VBox prefWidth="220" minWidth="204" spacing="14" styleClass="sidebar">
+            <padding>
+                <Insets top="30" right="24" bottom="24" left="24"/>
+            </padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="11">
+                <StackPane minWidth="38" minHeight="38" prefWidth="38" prefHeight="38"
+                           maxWidth="38" maxHeight="38" styleClass="brand-mark-small">
+                    <Text text="TC" styleClass="brand-mark-small-text"/>
+                </StackPane>
+                <VBox spacing="0">
+                    <Text text="TECHCRAFT" styleClass="sidebar-brand-name"/>
+                    <Text text="%brand.launcher" styleClass="sidebar-brand-kicker"/>
+                </VBox>
+            </HBox>
+
+            <Text text="%nav.launcher" styleClass="nav-section-label">
+                <VBox.margin>
+                    <Insets top="24"/>
+                </VBox.margin>
+            </Text>
+            <Button fx:id="homeBtn" text="%nav.home" maxWidth="Infinity"
+                    alignment="CENTER_LEFT" mnemonicParsing="false"
+                    styleClass="nav-button"/>
+            <Button text="%nav.downloads" maxWidth="Infinity"
+                    alignment="CENTER_LEFT" mnemonicParsing="false"
+                    styleClass="nav-button-active"/>
+            <Button fx:id="settingsBtn" text="%nav.settings" maxWidth="Infinity"
+                    alignment="CENTER_LEFT" mnemonicParsing="false"
+                    styleClass="nav-button"/>
+
+            <Region VBox.vgrow="ALWAYS"/>
+            <VBox spacing="6" styleClass="source-card">
+                <Text text="%download.source.title" styleClass="eyebrow-text"/>
+                <Text text="BMCLAPI + Mojang" styleClass="source-name"/>
+                <Text text="%download.source.description" wrappingWidth="150"
+                      styleClass="helper-text"/>
+            </VBox>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="18" styleClass="content-pane">
+            <padding>
+                <Insets top="32" right="34" bottom="26" left="34"/>
+            </padding>
+
+            <HBox alignment="CENTER_LEFT">
+                <VBox spacing="4">
+                    <Text text="%download.title" styleClass="page-title"/>
+                    <Text text="%download.subtitle" styleClass="page-subtitle"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="%download.badge" styleClass="download-badge"/>
+            </HBox>
+
+            <HBox spacing="8" styleClass="download-tabs">
+                <ToggleButton fx:id="gameTabBtn" text="%download.tab.game"
+                              mnemonicParsing="false" styleClass="download-tab"/>
+                <ToggleButton fx:id="modsTabBtn" text="%download.tab.mods"
+                              mnemonicParsing="false" styleClass="download-tab"/>
+                <ToggleButton fx:id="packsTabBtn" text="%download.tab.modpacks"
+                              mnemonicParsing="false" styleClass="download-tab"/>
+            </HBox>
+
+            <StackPane VBox.vgrow="ALWAYS">
+                <VBox fx:id="gamePane" spacing="16" styleClass="download-card">
+                    <HBox alignment="CENTER_LEFT">
+                        <VBox spacing="3">
+                            <Text text="%download.game.title" styleClass="card-title"/>
+                            <Text text="%download.game.subtitle" styleClass="card-subtitle"/>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label text="%download.game.step" styleClass="step-pill"/>
+                    </HBox>
+
+                    <HBox spacing="12">
+                        <VBox spacing="7" HBox.hgrow="ALWAYS">
+                            <Text text="%download.game.version" styleClass="field-label"/>
+                            <ComboBox fx:id="gameVersionCombo"
+                                      promptText="%download.game.versionPrompt"
+                                      maxWidth="Infinity" prefHeight="42"/>
+                        </VBox>
+                        <VBox spacing="7" HBox.hgrow="ALWAYS">
+                            <Text text="%download.game.loader" styleClass="field-label"/>
+                            <ComboBox fx:id="loaderCombo" maxWidth="Infinity"
+                                      prefHeight="42"/>
+                        </VBox>
+                        <VBox spacing="7" HBox.hgrow="ALWAYS">
+                            <Text text="%download.game.loaderVersion" styleClass="field-label"/>
+                            <ComboBox fx:id="loaderVersionCombo"
+                                      promptText="%download.game.autoVersion"
+                                      maxWidth="Infinity" prefHeight="42"/>
+                        </VBox>
+                    </HBox>
+
+                    <VBox spacing="12" styleClass="component-card">
+                        <HBox alignment="CENTER_LEFT" spacing="12">
+                            <VBox spacing="3" HBox.hgrow="ALWAYS">
+                                <CheckBox fx:id="optiFineCheck"
+                                          text="%download.optifine.title"
+                                          mnemonicParsing="false"
+                                          styleClass="component-check"/>
+                                <Text text="%download.optifine.description"
+                                      styleClass="card-subtitle"/>
+                            </VBox>
+                            <ComboBox fx:id="optiFineVersionCombo"
+                                      promptText="%download.optifine.version"
+                                      prefWidth="220" prefHeight="40"/>
+                        </HBox>
+                        <Text fx:id="compatibilityText"
+                              text="%download.compatibility.vanilla"
+                              wrappingWidth="710" styleClass="compatibility-text"/>
+                    </VBox>
+
+                    <Region VBox.vgrow="ALWAYS"/>
+                    <Button fx:id="installBtn" text="%download.game.install"
+                            maxWidth="Infinity" prefHeight="52"
+                            mnemonicParsing="false" styleClass="launch-button"/>
+                </VBox>
+
+                <VBox fx:id="modsPane" spacing="14" visible="false" managed="false"
+                      styleClass="download-card">
+                    <VBox spacing="3">
+                        <Text text="%download.mods.title" styleClass="card-title"/>
+                        <Text text="%download.mods.subtitle" styleClass="card-subtitle"/>
+                    </VBox>
+
+                    <HBox spacing="10">
+                        <TextField fx:id="modQueryField"
+                                   promptText="%download.search.prompt"
+                                   prefHeight="41" HBox.hgrow="ALWAYS"
+                                   styleClass="input-field"/>
+                        <ComboBox fx:id="modGameVersionCombo" prefWidth="138"
+                                  promptText="%download.game.version" prefHeight="41"/>
+                        <ComboBox fx:id="modLoaderCombo" prefWidth="126"
+                                  promptText="%download.game.loader" prefHeight="41"/>
+                        <Button fx:id="modSearchBtn" text="%download.search"
+                                prefHeight="41" mnemonicParsing="false"
+                                styleClass="secondary-button"/>
+                    </HBox>
+
+                    <ListView fx:id="modResultsList" VBox.vgrow="ALWAYS"
+                              styleClass="project-list"/>
+
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Text text="%download.mods.target" styleClass="field-label"/>
+                        <ComboBox fx:id="modTargetCombo"
+                                  promptText="%download.mods.targetPrompt"
+                                  maxWidth="Infinity" prefHeight="41"
+                                  HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="modDownloadBtn" text="%download.mods.download"
+                                prefHeight="41" mnemonicParsing="false"
+                                styleClass="launch-button"/>
+                    </HBox>
+                </VBox>
+
+                <VBox fx:id="packsPane" spacing="14" visible="false" managed="false"
+                      styleClass="download-card">
+                    <VBox spacing="3">
+                        <Text text="%download.packs.title" styleClass="card-title"/>
+                        <Text text="%download.packs.subtitle" styleClass="card-subtitle"/>
+                    </VBox>
+
+                    <HBox spacing="10">
+                        <TextField fx:id="packQueryField"
+                                   promptText="%download.search.packPrompt"
+                                   prefHeight="41" HBox.hgrow="ALWAYS"
+                                   styleClass="input-field"/>
+                        <ComboBox fx:id="packGameVersionCombo" prefWidth="138"
+                                  promptText="%download.game.version" prefHeight="41"/>
+                        <ComboBox fx:id="packLoaderCombo" prefWidth="138"
+                                  promptText="%download.allLoaders" prefHeight="41"/>
+                        <Button fx:id="packSearchBtn" text="%download.search"
+                                prefHeight="41" mnemonicParsing="false"
+                                styleClass="secondary-button"/>
+                    </HBox>
+
+                    <ListView fx:id="packResultsList" VBox.vgrow="ALWAYS"
+                              styleClass="project-list"/>
+
+                    <HBox alignment="CENTER_LEFT">
+                        <Text text="%download.packs.destination"
+                              styleClass="helper-text"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="packDownloadBtn"
+                                text="%download.packs.download"
+                                prefHeight="41" mnemonicParsing="false"
+                                styleClass="launch-button"/>
+                    </HBox>
+                </VBox>
+            </StackPane>
+
+            <VBox spacing="9" styleClass="status-panel">
+                <ProgressBar fx:id="downloadProgress" maxWidth="Infinity"
+                             visible="false" managed="false"/>
+                <Text fx:id="downloadStatusText"
+                      text="%download.status.loadingCatalog"
+                      wrappingWidth="760" styleClass="status-text"/>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>
