@@ -223,9 +223,15 @@
             <VBox spacing="9" styleClass="status-panel">
                 <ProgressBar fx:id="downloadProgress" maxWidth="Infinity"
                              visible="false" managed="false"/>
-                <Text fx:id="downloadStatusText"
-                      text="%download.status.loadingCatalog"
-                      wrappingWidth="760" styleClass="status-text"/>
+                <HBox alignment="CENTER_LEFT" spacing="14">
+                    <Text fx:id="downloadStatusText"
+                          text="%download.status.loadingCatalog"
+                          wrappingWidth="480" styleClass="status-text"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Text fx:id="downloadMetricsText" visible="false" managed="false"
+                          text="" wrappingWidth="350" textAlignment="RIGHT"
+                          styleClass="download-metrics-text"/>
+                </HBox>
             </VBox>
         </VBox>
     </center>

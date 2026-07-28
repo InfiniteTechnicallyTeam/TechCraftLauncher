@@ -731,6 +731,12 @@
     -fx-font-size: 11px;
 }
 
+.download-metrics-text {
+    -fx-fill: #7dd3fc;
+    -fx-font-size: 10px;
+    -fx-font-weight: 700;
+}
+
 .status-muted {
     -fx-fill: #718096;
 }
