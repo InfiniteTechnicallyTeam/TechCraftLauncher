@@ -55,6 +55,10 @@ dependencies {
     implementation("org.openjfx:javafx-controls:$javafxVersion:win")
     implementation("org.openjfx:javafx-fxml:$javafxVersion:win")
     implementation("org.openjfx:javafx-graphics:$javafxVersion:win")
+
+    // Networking + IO improvements for downloader
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+    implementation("com.squareup.okio:okio:3.4.0")
 }
 
 // 编译优化
@@ -87,10 +91,9 @@ tasks.register<Jar>("fatJar") {
     })
     
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    
-    // 排除不必要的文件
-    exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
-    exclude("META-INF/INDEX.LIST")
+// 排除不必要的文件
+exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
+exclude("META-INF/INDEX.LIST")
 }
 
 // 测试配置（如果有）
@@ -115,3 +118,4 @@ tasks.register("cleanAll") {
         delete(".gradle")
     }
 }
+
