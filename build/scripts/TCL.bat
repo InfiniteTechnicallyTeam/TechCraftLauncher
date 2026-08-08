@@ -36,7 +36,7 @@ set APP_HOME=%DIRNAME%..
 for %%i in ("%APP_HOME%") do set APP_HOME=%%~fi
 
 @rem Add default JVM options here. You can also use JAVA_OPTS and TCL_OPTS to pass JVM options to this script.
-set DEFAULT_JVM_OPTS="-Dfile.encoding=UTF-8" "-Dsun.stdout.encoding=UTF-8" "-Dsun.stderr.encoding=UTF-8"
+set DEFAULT_JVM_OPTS="-Dfile.encoding=UTF-8" "-Dsun.stdout.encoding=UTF-8" "-Dsun.stderr.encoding=UTF-8" "-XX:+UseG1GC" "-XX:+UseStringDeduplication" "-XX:MaxGCPauseMillis=200" "-XX:InitiatingHeapOccupancyPercent=45" "-XX:G1HeapRegionSize=16m" "-XX:G1ReservePercent=15" "-Xmx512m" "-Xms128m" "-XX:+TieredCompilation" "-XX:TieredStopAtLevel=1"
 
 @rem Find java.exe
 if defined JAVA_HOME goto findJavaFromJavaHome
